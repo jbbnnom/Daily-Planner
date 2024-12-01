@@ -2,9 +2,13 @@
 
 #include "ScreenManager.h"
 #include "HomeScreen.h"
-#include "PlannerScreen.h"
+#include "EnterToDoScreen.h"
+#include "LoadToDoScreen.h"
 
 #include "Planner.h"
+
+#include "ToDoManagement.h"
+#include "ToDo.h"
 
 #include <iostream>
 #include <Windows.h>
@@ -14,19 +18,23 @@
 #include <vector>
 
 
-#define HOME 0
-#define PL 1
+#define HOME  0
+#define ENTER 1
+#define LOAD  2
 
 using namespace std;
 namespace fs = std::filesystem;
 
+
 int main()
 {
 	int mode = 0;
-	ScreenManager* screenMgr = new HomeScreen();	// Dynamic binding을 통해 화면을 유동적으로 관리
-	Planner myPlanner{};
+	Planner myPlanner;
+	ToDoManagement myTdm;
 
-	// 바탕화면 경로 지정 후 할 일이 저장될 폴더(디렉터리) 생성
+	ScreenManager* screenMgr = new HomeScreen(myPlanner, myTdm);	// Dynamic binding을 통해 화면을 유동적으로 관리
+
+	// 바탕화면 경로 지정 후 to-do가 저장될 폴더(디렉터리) 생성
 	fs::path plannerDir = fs::path(getenv("USERPROFILE")) / "Desktop" / "Daily Planner";
 	if (!fs::exists(plannerDir)) {
 		fs::create_directory(plannerDir);
@@ -39,11 +47,18 @@ int main()
 
 		switch (mode) {
 		case HOME:
-			continue;
-		case PL:
-			screenMgr = new PlannerScreen(myPlanner);
+			screenMgr = new HomeScreen(myPlanner, myTdm);
+			break;
+		case ENTER:
+			screenMgr = new EnterToDoScreen(myPlanner, myTdm);
+			break;
+		case LOAD:
+			screenMgr = new LoadToDoScreen(myPlanner, myTdm);
+			break;
 		}
 	}
+	
+	delete screenMgr;
 	
 	return 0;
 }

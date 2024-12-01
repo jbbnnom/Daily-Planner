@@ -15,7 +15,7 @@ void HomeScreen::drawScreen(int& mode)
 	auto ymd = chrono::year_month_day{ now_time };
 
 	// 더블 버퍼링을 위해 준비한 2개의 버퍼 설정 적용
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < 2; i++) {
 		HANDLE buffer = hBuffer[i];
 
 		SetConsoleTitleA("Daily Planner");
@@ -26,13 +26,11 @@ void HomeScreen::drawScreen(int& mode)
 		drawTitle(buffer);
 		
 		// 오늘의 할 일(구현 예정) 및 메뉴 출력
-		writeBuffer(buffer, 24, 18, "Today is " + to_string(static_cast<int>(ymd.year())) +
-			"-" + to_string(static_cast<unsigned>(ymd.month())) +
-			"-" + to_string(static_cast<unsigned>(ymd.day())));
+		writeBuffer(buffer, 24, 18, "Today is " + dateToStr(ymd));
 
 		writeBuffer(buffer, 19, 20, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
-		writeBuffer(buffer, 26, 22, "Enter new to-do");
-		writeBuffer(buffer, 26, 22 + 2, "Watch Calendar");
+		writeBuffer(buffer, 26, 22, "Enter new To-do");
+		writeBuffer(buffer, 26, 22 + 2, "Load To-dos");
 		writeBuffer(buffer, 26, 22 + 4, "Exit");
 		writeBuffer(buffer, 19, 28, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
 	}
@@ -46,7 +44,6 @@ void HomeScreen::drawScreen(int& mode)
 		for (int y = 22; y <= 26; y += 2) {
 			writeBuffer(buffer, 22, y, "  ");
 		}
-
 		writeBuffer(buffer, 22, posY, "▶");
 
 		// 키보드 입력
@@ -62,12 +59,13 @@ void HomeScreen::drawScreen(int& mode)
 				}
 			}
 			else if (keyInput == ENTER) {
-				if (posY == 22) {	
+				if (posY == 22) {
 					mode = 1;
 					break;
 				}
 				else if (posY == 24) {
-
+					mode = 2;
+					break;
 				}
 				else if (posY == 26) {
 					exit(0);
@@ -78,28 +76,4 @@ void HomeScreen::drawScreen(int& mode)
 		swapBuffer();
 		Sleep(16);
 	}
-}
-
-// 타이틀 출력
-void HomeScreen::drawTitle(HANDLE handle)
-{
-	string s;
-
-	s += "\n  ########     ###    #### ##       ##    ##\n";
-	s += "  ##     ##   ## ##    ##  ##        ##  ## \n";
-	s += "  ##     ##  ##   ##   ##  ##         ####  \n";
-	s += "  ##     ## ##     ##  ##  ##          ##   \n";
-	s += "  ##     ## #########  ##  ##          ##   \n";
-	s += "  ##     ## ##     ##  ##  ##          ##   \n";
-	s += "  ########  ##     ## #### ########    ##   \n\n";
-
-	s += "  ########  ##          ###    ##    ## ##    ## ######## ######## \n";
-	s += "  ##     ## ##         ## ##   ###   ## ###   ## ##       ##     ##\n";
-	s += "  ##     ## ##        ##   ##  ####  ## ####  ## ##       ##     ##\n";
-	s += "  ########  ##       ##     ## ## ## ## ## ## ## ######   ######## \n";
-	s += "  ##        ##       ######### ##  #### ##  #### ##       ##   ##  \n";
-	s += "  ##        ##       ##     ## ##   ### ##   ### ##       ##    ## \n";
-	s += "  ##        ######## ##     ## ##    ## ##    ## ######## ##     ##\n\n\n";
-
-	writeBuffer(handle, 0, 0, s);
 }

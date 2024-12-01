@@ -4,12 +4,11 @@
 #include "ScreenManager.h"
 
 class HomeScreen : public ScreenManager {
-private:
-	
 public:
 	HomeScreen() = default;
+	HomeScreen(Planner& planner, ToDoManagement& tdm) : ScreenManager(planner, tdm) {};
+
 	void drawScreen(int& mode) override;
-	void drawTitle(HANDLE handle);
 };
 
 #endif
