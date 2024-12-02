@@ -56,60 +56,39 @@ void Planner::printCalendar()
 /* 사용자가 입력한 할 일 하나를 텍스트 파일에 저장 */
 void Planner::writeToFile(ToDo &todo)
 {
-	setPlannerPath(3);
+	setPlannerPath(1);
 	fstream file(plannerPath, ios::app);	// 파일이 이미 있는 경우 이어서 작성해야 함
 
 	if (file.is_open()) {
-		ToDoManagement::save_toFile(file, todo);
+		ToDoManagement::saveToDo(file, todo);
 	}
 
 	file.close();
 }
 
 
-/* 모든 일자의 텍스트 파일로부터 할 일을 가져오는 함수 */
+/* 모든 일자의 텍스트 파일로부터 할 일을 가져와 todos 벡터에 저장 
+ * (카테고리별 검색 및 중요도 순 정렬에 활용)
+ */
 void Planner::loadAllToDos(ToDoManagement& tdm)
 {
+	// 시작 전 todos 벡터를 비우고 경로를 "~\Desktop\Daily Planner"로 변경
 	tdm.clearToDos();
 	resetPlannerPath();
 
+	// 경로의 유효성 검사
 	if (!fs::exists(plannerPath) || !fs::is_directory(plannerPath)) {
 		cout << "Invalid path: " << plannerPath << endl;
 		return;
 	}
 
+	// Daily Planner의 모든 하위 디렉터리, 즉 모든 일자의 to-do list를 검색해 todos 벡터에 저장
 	for (const auto& entry : fs::recursive_directory_iterator(plannerPath)) {
 		if (fs::is_regular_file(entry.path()) && entry.path().extension() == ".txt") {
-			tdm.loadOneDayToDos(plannerPath);
-			cout << "Successfully loaded : " << plannerPath << endl;	// test output
+			tdm.loadOneDayToDos(entry.path());
+			cout << "Successfully loaded : " << entry.path() << endl;	// test output
 		}
 	}
-}
-
-
-
-void Planner::setYearMonth(int yearValue, int monthValue)
-{
-	if (ym != nullptr) {
-		delete ym;
-	}
-	ym = new year_month{ year(yearValue) / month(monthValue) };
-}
-
-void Planner::setDay(int dayValue)
-{
-	if (d != nullptr) {
-		delete d;
-	}
-	d = new day(dayValue);
-}
-
-void Planner::setYearMonthDay()
-{
-	if (ymd != nullptr) {
-		delete ymd;
-	}
-	ymd = new year_month_day(ym->year() / ym->month() / *d);
 }
 
 
@@ -118,17 +97,26 @@ void Planner::setYearMonthDay()
  */
 void Planner::setPlannerPath(int mode)
 {
+	string yearStr, dayStr;
+
 	resetPlannerPath();
 
-	if (mode >= 1) {
-		string yearStr = to_string(static_cast<int>(ym->year()));
+	if (mode == 0) {	// year_month_day 객체로부터 설정
+		yearStr = to_string(static_cast<int>(ymd->year()));
 		plannerPath /= yearStr;
+
+		plannerPath /= stringMonth[static_cast<unsigned>(ymd->month())];
+
+		dayStr = format("{}", ymd->day());
+		plannerPath /= dayStr;
 	}
-	if (mode >= 2) {
+	else if (mode == 1) {	// year_month 객체와 day 객체로부터 설정
+		yearStr = to_string(static_cast<int>(ym->year()));
+		plannerPath /= yearStr;
+		
 		plannerPath /= stringMonth[static_cast<unsigned>(ym->month())];
-	}
-	if (mode >= 3) {
-		string dayStr = format("{}", *d);
+
+		dayStr = format("{}", *d);
 		plannerPath /= dayStr;
 	}
 
@@ -137,4 +125,66 @@ void Planner::setPlannerPath(int mode)
 	}
 
 	plannerPath /= "To-do list.txt";
+}
+
+
+/* year_month 객체에 년/월 정보 저장
+ * (EnterToDoScreen에서 년과 월만 받고 달력을 출력하기 때문에 별도로 생성함)
+ */
+void Planner::setYearMonth(int yearValue, int monthValue)
+{
+	if (ym != nullptr) {
+		delete ym;
+	}
+	ym = new year_month{ year(yearValue) / month(monthValue) };
+}
+
+/* day 객체에 일 정보 저장 */
+void Planner::setDay(int dayValue)
+{
+	if (d != nullptr) {
+		delete d;
+	}
+	d = new day(dayValue);
+}
+
+/* year_month_day 객체에 년/월/일 정보 저장 [Overloading #1 - year_month 타입 멤버와 day 타입 멤버로부터] */
+void Planner::setYearMonthDay()
+{
+	if (ymd != nullptr) {
+		delete ymd;
+	}
+	ymd = new year_month_day(ym->year() / ym->month() / *d);
+}
+
+/* year_month_day 객체에 년/월/일 정보 저장 [Overloading #2 - 매개변수로 받은 년/월/일의 정수값으로부터] */
+void Planner::setYearMonthDay(int yearValue, int monthValue, int dayValue)
+{
+	if (ymd != nullptr) {
+		delete ymd;
+	}
+	ymd = new year_month_day{ year(yearValue) / month(monthValue) / day(dayValue)};
+}
+
+/* year_month_day 객체에 년/월/일 정보 저장 [Overloading #3 - 매개변수로 받은 year_month_day 객체로부터] */
+void Planner::setYearMonthDay(year_month_day& p_ymd)
+{
+	if (ymd != nullptr) {
+		delete ymd;
+	}
+	ymd = new year_month_day{ p_ymd.year() / p_ymd.month() / p_ymd.day() };
+}
+
+
+/* year_month_day 객체를 문자열(ex. December 9, 2024)로 변환 */
+string dateToStr(year_month_day& ymd)
+{
+	vector<const char*> stringMonth = { "",
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December"
+	};
+
+	return string(stringMonth[static_cast<unsigned>(ymd.month())]) +
+		" " + to_string(static_cast<unsigned>(ymd.day())) +
+		", " + to_string(static_cast<int>(ymd.year()));
 }

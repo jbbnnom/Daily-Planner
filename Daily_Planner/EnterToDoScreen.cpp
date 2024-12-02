@@ -6,8 +6,6 @@ using namespace std;
 void EnterToDoScreen::drawScreen(int& mode)
 {
 	int yearInput, monthInput, dayInput;
-	int keyInput;
-
 
 	// 사용자로부터 년도와 월 입력 후 설정
 	cout << "----------Enter the information about date----------" << endl;
@@ -15,8 +13,9 @@ void EnterToDoScreen::drawScreen(int& mode)
 		cout << "Enter year: ";
 		cin >> yearInput;
 
-		if (cin.fail()) {
+		if (cin.fail()) {	// 유효성 확인
 			cin.clear();
+			cin.ignore(32767, '\n');
 			cerr << "Invalid year. Try again." << endl;
 		}
 		else {
@@ -29,6 +28,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 
 		if (cin.fail() || monthInput < 1 || monthInput > 12) {
 			cin.clear();
+			cin.ignore(32767, '\n');
 			cerr << "Invalid month. Try again." << endl;
 		}
 		else {
@@ -41,15 +41,15 @@ void EnterToDoScreen::drawScreen(int& mode)
 	system("cls");
 	myPlanner.printCalendar();
 
-	// 일 입력 후 to-do 입력
+	// 일 입력
 	moveCursor(10, 10);
-
 	while (true) {
 		cout << "Enter day: ";
 		cin >> dayInput;
 
 		if (cin.fail() || dayInput < 1 || dayInput > 12) {
 			cin.clear();
+			cin.ignore(32767, '\n');
 			cerr << "Invalid month. Try again." << endl;
 		}
 		else {
@@ -58,6 +58,8 @@ void EnterToDoScreen::drawScreen(int& mode)
 	}
 	myPlanner.setDay(dayInput);
 
+
+	// 사용자에게 입력한 날짜 보여주고 to-do 입력 모드 진입
 	system("cls");
 	myPlanner.printCalendar();
 
@@ -68,74 +70,13 @@ void EnterToDoScreen::drawScreen(int& mode)
 	cout << "You have selected " << dateToStr(myPlanner.getYearMonthDay())
 		 << " [" << wd << "]\n" << endl;
 
-	makeNewToDo();
-	myPlanner.writeToFile(*todo);
+	// 입력한 to-do는 ToDoManagement 클래스의 newTodo 멤버로 동적 할당되어 저장
+	myTdm.makeNewToDo();
+	myPlanner.writeToFile(myTdm.getNewToDo());
 
-	cout << "Your new to-do is successfully made! Press ESC to go home screen...";
-	keyInput = _getch();
-	if (_kbhit && keyInput == ESC) {
-		mode = 0;
-	}
-	
-	delete todo;
-}
+	// newTodo 멤버 메모리 할당 해제 후 홈 화면으로 복귀
+	myTdm.deallocToDo();
 
-void EnterToDoScreen::makeNewToDo()
-{
-	string task, date, startTime, endTime, category;
-	int importance;
-
-	cout << "----------Enter the information about your To-do----------" << endl;
-
-	cout << "Enter task: ";
-	cin.ignore();
-	getline(cin, task);
-
-	while (true) {
-		cout << "Enter date[YYYY-MM-DD]: ";
-		cin.ignore();
-		getline(cin, date);
-
-		if (!isValidDate(date)) {
-			cout << "Invalid date format. Try again." << endl;
-		}
-		else {
-			break;
-		}
-	}
-
-	while (true) {
-		cout << "Enter start time [HH:MM:SS]: ";
-		cin.ignore();
-		getline(cin, startTime);
-
-		if (!isValidTime(startTime)) {
-			cout << "Invalid time format. Try again." << endl;
-		}
-		else {
-			break;
-		}
-	}
-
-	while (true) {
-		cout << "Enter end time [HH:MM:SS]: ";
-		cin.ignore();
-		getline(cin, endTime);
-
-		if (!isValidTime(endTime)) {
-			cout << "Invalid time format. Try again." << endl;
-		}
-		else {
-			break;
-		}
-	}
-
-	cout << "Enter category: ";
-	cin.ignore();
-	getline(cin, category);
-
-	cout << "Enter importance [lower number, lower importance | equal or greater than 0]: ";
-	cin >> importance;
-	
-	todo = new ToDo(task, date, startTime, endTime, category, importance);	// check는 default parameter라 항상 false
+	cout << "New to-do is successfully made!" << endl;
+	mode = backToHomeScreen();
 }

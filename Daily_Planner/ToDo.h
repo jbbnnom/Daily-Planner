@@ -21,9 +21,9 @@ private:
 	bool check = false;		// true는 이행 완료 상태. false는 아직 이행 안 된 상태.
 public:
 	//constructor
-	ToDo(std::string task = "nothing", std::string date,
+	ToDo(std::string task, std::string date,
 		std::string start_time, std::string end_time,
-		std::string category = "none", int importance = 0,
+		std::string category, int importance,
 		bool check = false);
 
 	//setter
@@ -69,8 +69,8 @@ public:
 		return importance;
 		//아니 굳이 이걸 해야되나???????그냥 멤버변수 싹다 퍼블릭 설정하면 안되냐
 	}
-	int getCheck() {
-		return check;
+	std::string getCheck() {
+		return check ? "Y" : "N";
 	}
 
 	static std::string now_date();

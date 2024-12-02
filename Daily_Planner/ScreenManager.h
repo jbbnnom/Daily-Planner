@@ -10,7 +10,7 @@
 #include <chrono>
 #include <iomanip>
 #include <string>
-#include <regex>
+#include <thread>
 
 #define ARROW 224
 #define UP    72
@@ -19,8 +19,9 @@
 #define ESC   27
 
 
-/* 화면에 보여지는 모든 스크린을 관리하는 클래스
+/* 화면에 보여지는 모든 스크린을 관리하는 abstract 클래스
  * HomeScreen, EnterToDoScreen, LoadToDoScreen의 부모 클래스이다.
+ * 자식 클래스는 반드시 drawScreen()을 override 해야 한다.
  */
 class ScreenManager {
 protected:
@@ -54,9 +55,7 @@ public:
 	void setConsoleSize(HANDLE buffer, SHORT width, SHORT height);
 
 	void drawTitle(HANDLE handle);
-	bool isValidDate(const std::string& date);
-	bool isValidTime(const std::string& time);
-	bool isValidCategory(const std::string& category);
+	int backToHomeScreen();
 };
 
 #endif

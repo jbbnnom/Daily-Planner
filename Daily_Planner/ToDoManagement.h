@@ -7,19 +7,23 @@
 #include <sstream>
 #include <algorithm>
 #include <filesystem>
+#include <regex>
+
 #include "ToDo.h"
 
 class ToDoManagement {
 private:
+	ToDo* newTodo;
 	std::vector<ToDo> todos;
+	std::vector<ToDo> searchResult;
 
 	static bool compareImportance(ToDo& a, ToDo& b) {
 		return a.getImportance() > b.getImportance();
 	}
 
 public:
-
-	void clearToDos() { todos.clear(); }
+	/* vector<ToDo> 내용 제거 */
+	void clearToDos() { todos.clear(); searchResult.clear(); }
 
 	/*Index가 유효한지 간편하게 확인하기 위한 함수.다른 함수 내에서만 쓰임.*/
 	bool IndexExistence(int index);
@@ -83,27 +87,33 @@ public:
 		}
 	}
 
+	ToDo getNewToDo() { return *newTodo; }
+	void deallocToDo() { delete newTodo; }
+	std::vector<ToDo> getResult() { return searchResult; }
+
+	bool isValidDate(const std::string& date);
+	bool isValidTime(const std::string& time);
+
+	/* 새로운 to-do 제작 */
+	void makeNewToDo();
 
 
 	/* todo 목록 불러오기 */
-
-	//해당하는 일자의 todo목록 불러오기
-	void getToDosByDate(int date);
-
-	//category에 해당하는 todo 불러오기
-	std::vector<ToDo> getToDoByCategory(std::string category);
-
-	//importance에 따라 todo 정렬
-	std::vector<ToDo> sortToDoByImportance();
+	int getToDosByDate(const std::filesystem::path& filename);
+	void getToDoByCategory(const std::string &category);
+	void sortToDoByImportance();
 
 
 	/* 일 텍스트 파일과의 상호작용 */
+	static void saveToDo(std::fstream& file, ToDo &todo);
+	int loadOneDayToDos(const std::filesystem::path& filename);
 
-	//날짜별로 파일에 저장
-	static void save_toFile(std::fstream& file, ToDo &todo);
 
-	//한 날짜의 todo 파일 불러오기
-	void loadOneDayToDos(const std::filesystem::path& filename);
+	/* 각 불러오기 별 Todos vector 내 모든 요소 출력 */
+	void printToDos_date();
+	void printToDos_category();
+	void printToDos_importance();
+	ToDo printToDos_editMode();
 };
 
 #endif

@@ -19,8 +19,8 @@
 
 
 #define HOME  0
-#define ENTER 1
-#define LOAD  2
+#define WRITE 1
+#define READ  2
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -28,7 +28,7 @@ namespace fs = std::filesystem;
 
 int main()
 {
-	int mode = 0;
+	int mode = 0;   // 화면 모드 (0: HOME, 1: EnterToDOScreen, 2: LoadToDoScreen)
 	Planner myPlanner;
 	ToDoManagement myTdm;
 
@@ -40,25 +40,30 @@ int main()
 		fs::create_directory(plannerDir);
 	}
 
-	while (true) {
-		screenMgr->drawScreen(mode);
+    while (true) {
+        // 현재 화면 출력
+        screenMgr->drawScreen(mode);
 
-		delete screenMgr;
+        // 화면 출력 종료 후 다음 화면 모드 관리
+        if (mode == 0) {
+            delete screenMgr;
+            screenMgr = new HomeScreen(myPlanner, myTdm);
+            continue;
+        }
 
-		switch (mode) {
-		case HOME:
-			screenMgr = new HomeScreen(myPlanner, myTdm);
-			break;
-		case ENTER:
-			screenMgr = new EnterToDoScreen(myPlanner, myTdm);
-			break;
-		case LOAD:
-			screenMgr = new LoadToDoScreen(myPlanner, myTdm);
-			break;
-		}
-	}
-	
+        delete screenMgr;
+        screenMgr = nullptr;
+
+        switch (mode) {
+        case WRITE:
+            screenMgr = new EnterToDoScreen(myPlanner, myTdm);
+            break;
+        case READ:
+            screenMgr = new LoadToDoScreen(myPlanner, myTdm);
+            break;
+        }
+    }  // end of while
+
 	delete screenMgr;
-	
 	return 0;
 }
