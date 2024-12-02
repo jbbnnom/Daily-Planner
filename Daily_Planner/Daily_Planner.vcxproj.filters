@@ -24,10 +24,19 @@
     <ClCompile Include="HomeScreen.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PlannerScreen.cpp">
+    <ClCompile Include="EnterToDoScreen.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Planner.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToDo.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToDoManagement.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadToDoScreen.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +50,16 @@
     <ClInclude Include="Planner.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="PlannerScreen.h">
+    <ClInclude Include="EnterToDoScreen.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToDo.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToDoManagement.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadToDoScreen.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

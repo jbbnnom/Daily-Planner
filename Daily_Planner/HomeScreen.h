@@ -3,13 +3,15 @@
 
 #include "ScreenManager.h"
 
+/* 시작 화면 담당 클래스
+ * ScreenManager의 자식 클래스이다.
+ */
 class HomeScreen : public ScreenManager {
-private:
-	
 public:
 	HomeScreen() = default;
+	HomeScreen(Planner& planner, ToDoManagement& tdm) : ScreenManager(planner, tdm) {};
+
 	void drawScreen(int& mode) override;
-	void drawTitle(HANDLE handle);
 };
 
 #endif

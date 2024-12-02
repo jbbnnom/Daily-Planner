@@ -130,16 +130,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HomeScreen.cpp" />
+    <ClCompile Include="LoadToDoScreen.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Planner.cpp" />
-    <ClCompile Include="PlannerScreen.cpp" />
+    <ClCompile Include="EnterToDoScreen.cpp" />
     <ClCompile Include="ScreenManager.cpp" />
+    <ClCompile Include="ToDo.cpp" />
+    <ClCompile Include="ToDoManagement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HomeScreen.h" />
+    <ClInclude Include="LoadToDoScreen.h" />
     <ClInclude Include="Planner.h" />
-    <ClInclude Include="PlannerScreen.h" />
+    <ClInclude Include="EnterToDoScreen.h" />
     <ClInclude Include="ScreenManager.h" />
+    <ClInclude Include="ToDo.h" />
+    <ClInclude Include="ToDoManagement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

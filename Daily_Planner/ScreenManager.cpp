@@ -2,8 +2,14 @@
 
 using namespace std;
 
-ScreenManager::ScreenManager()
+/* [Constructor defintion]
+ * main.cpp의 myPlanner와 myTdm을 사용해야 하므로 reference 타입의 매개변수 사용
+ */
+ScreenManager::ScreenManager(Planner& planner, ToDoManagement& tdm)
 {
+	myPlanner = planner;
+	myTdm = tdm;
+
 	// 더블 버퍼링을 위해 HANDLE 타입 버퍼 2개를 생성
 	hBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	hBuffer[1] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -20,14 +26,14 @@ ScreenManager::ScreenManager()
 }
 
 
-// 매개변수로 주어진 좌표로 커서 이동_Default Console
+/* 매개변수로 주어진 좌표로 커서 이동 [Overloading #1 - Default Console] */
 void ScreenManager::moveCursor(SHORT x, SHORT y)
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-// 매개변수로 주어진 좌표로 커서 이동_User-made Buffer
+/* 매개변수로 주어진 좌표로 커서 이동 [Overloading #2 - User-made Buffer] */
 void ScreenManager::moveCursor(HANDLE buffer, SHORT x, SHORT y)
 {
 	COORD pos = { x, y };
@@ -35,7 +41,9 @@ void ScreenManager::moveCursor(HANDLE buffer, SHORT x, SHORT y)
 }
 
 
-// 주어진 버퍼에 내용을 작성(더블 버퍼링 구현 시 cout 사용이 제한되어 제작)
+/* 주어진 버퍼에 내용을 작성 [Overloading #1 - C-style 문자열]
+ * (더블 버퍼링 구현 시 cout 사용이 제한되어 제작)
+ */
 void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const char* content)
 {
 	DWORD charsWritten;
@@ -44,7 +52,9 @@ void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const char* con
 	WriteFile(buffer, content, strlen(content), &charsWritten, NULL);
 }
 
-// string 타입을 작성하기 위해 오버로드
+/* 주어진 버퍼에 내용을 작성 [Overloading #2 - string 타입 문자열]
+ * (더블 버퍼링 구현 시 cout 사용이 제한되어 제작)
+ */
 void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const string& content)
 {
 	DWORD charsWritten;
@@ -54,9 +64,10 @@ void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const string& c
 }
 
 
-// 버퍼 크기만큼 공백을 입력해 현재 화면에 보이는 내용을 모두 제거
+/* 버퍼 크기만큼 공백을 입력해 현재 화면에 보이는 내용을 모두 제거 */
 void ScreenManager::clearBuffer(HANDLE buffer)
 {
+	// 현재 버퍼의 크기를 불러와 저장
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(buffer, &csbi);
 	COORD bufferSize = csbi.dwSize;
@@ -66,7 +77,7 @@ void ScreenManager::clearBuffer(HANDLE buffer)
 }
 
 
-// 두 버퍼를 교환해 flickering 현상 방지
+/* 두 버퍼를 교환해 flickering 현상 방지 */
 void ScreenManager::swapBuffer()
 {
 	SetConsoleActiveScreenBuffer(hBuffer[active]);
@@ -74,7 +85,7 @@ void ScreenManager::swapBuffer()
 }
 
 
-// 매개변수로 받은 콘솔 창 및 버퍼의 크기를 조절 (width * height)
+/* 매개변수로 받은 콘솔 창 및 버퍼의 크기를 조절 (width * height) */
 void ScreenManager::setConsoleSize(HANDLE buffer, SHORT width, SHORT height)
 {
     // #1: 원할한 변환을 위해 현재 창 크기를 줄여야 함
@@ -100,3 +111,54 @@ void ScreenManager::setConsoleSize(HANDLE buffer, SHORT width, SHORT height)
 	SetWindowPos(hwndConsole, NULL, 0, 0, 0, 0,
 		SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
+
+/* 타이틀 출력 */
+void ScreenManager::drawTitle(HANDLE handle)
+{
+	string s;
+
+	s += "\n  ########     ###    #### ##       ##    ##\n";
+	s += "  ##     ##   ## ##    ##  ##        ##  ## \n";
+	s += "  ##     ##  ##   ##   ##  ##         ####  \n";
+	s += "  ##     ## ##     ##  ##  ##          ##   \n";
+	s += "  ##     ## #########  ##  ##          ##   \n";
+	s += "  ##     ## ##     ##  ##  ##          ##   \n";
+	s += "  ########  ##     ## #### ########    ##   \n\n";
+
+	s += "  ########  ##          ###    ##    ## ##    ## ######## ######## \n";
+	s += "  ##     ## ##         ## ##   ###   ## ###   ## ##       ##     ##\n";
+	s += "  ##     ## ##        ##   ##  ####  ## ####  ## ##       ##     ##\n";
+	s += "  ########  ##       ##     ## ## ## ## ## ## ## ######   ######## \n";
+	s += "  ##        ##       ######### ##  #### ##  #### ##       ##   ##  \n";
+	s += "  ##        ##       ##     ## ##   ### ##   ### ##       ##    ## \n";
+	s += "  ##        ######## ##     ## ##    ## ##    ## ######## ##     ##\n\n\n";
+
+	writeBuffer(handle, 0, 0, s);
+}
+
+/* EnterToDoScreen이나 LoadToDoScreen에서 모든 활동이 종료되었을 때
+ * ESC키를 누르면 홈(메인)화면으로 복귀
+ */
+int ScreenManager::backToHomeScreen() {
+	std::cout << "Press ESC to go home screen...\n";
+
+	// 계속해서 ESC키가 정상적으로 눌렸는지 확인
+	while (true) {
+		if (_kbhit()) {
+			int keyInput = _getch();
+			std::cout << "Key pressed: " << keyInput << std::endl;
+
+			if (keyInput == ESC) {
+				return 0; // HOME 스크린의 매크로 값 = 0
+			}
+			else {
+				std::cout << "Invalid key pressed. Press ESC to return.\n";
+			}
+		}
+		// Introduce a small delay to prevent busy-waiting
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	}
+
+	return -1; // 경고 방지용
+}
+
