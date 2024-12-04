@@ -20,6 +20,7 @@ void Planner::printCalendar(int mode)
 
 	system("cls");
 
+	cout << endl;
 	cout << setw(5 * width) << right << stringMonth[static_cast<unsigned>(ym->month())] << " " << ym->year() << "\n\n";
 
 	cout << setw(5 * (width - 3)) << right << "SUN";

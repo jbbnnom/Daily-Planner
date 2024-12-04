@@ -47,7 +47,7 @@ void ToDoManagement::makeNewToDo()
 	string task, date, startTime, endTime, category;
 	int importance;
 
-	cout << "---------------Enter the information about your To-do----------------" << endl;
+	cout << "--------------[Enter the information about your To-do]---------------" << endl;
 
 	cout << "Enter task: ";
 	if (cin.peek() == '\n') {

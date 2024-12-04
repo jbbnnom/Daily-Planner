@@ -125,6 +125,9 @@ int LoadToDoScreen::showByDate()
 
 	system("mode con: cols=80 lines=40");
 
+	moveCursor(0, 1);
+	cout << "[Load by date]\n" << endl;
+
 	while (true) {
 		cout << "Enter date[YYYY-MM-DD]: ";
 		if (cin.peek() == '\n') {	// proj1에서 발생한 고질적인 문제가 반복되어 발생해 해결
@@ -170,6 +173,9 @@ int LoadToDoScreen::showByCategory()
 
 	system("mode con: cols=82 lines=40");
 
+	moveCursor(0, 1);
+	cout << "[Load by category]\n" << endl;
+
 	cout << "Enter category: ";
 	if (cin.peek() == '\n') {
 		cin.ignore();
@@ -186,7 +192,7 @@ int LoadToDoScreen::showByCategory()
 	}
 	else {
 		system("cls");
-		moveCursor(30, 0);
+		moveCursor(30, 1);
 		cout << "[All to-dos in \'" << categoryInput << "\']\n" << endl;
 		myTdm.printToDos_category();
 	}
@@ -199,12 +205,15 @@ void LoadToDoScreen::showByImportance()
 {
 	system("mode con: cols=92 lines=40");
 
+	moveCursor(20, 1);
+	cout << "[Load after sorting by importance]" << endl;
+
 	myPlanner.loadAllToDos(myTdm);
 
 	myTdm.sortToDoByImportance();
 
 	system("cls");
-	moveCursor(35, 0);
+	moveCursor(35, 1);
 	cout << "[Sorted by Importance]\n" << endl;
 	myTdm.printToDos_importance();
 }
@@ -216,7 +225,7 @@ void LoadToDoScreen::editToDo()
 	system("cls");
 	system("mode con: cols=97 lines=40");
 
-	moveCursor(40, 0);
+	moveCursor(40, 1);
 	cout << "[Edit mode]\n" << endl;
 
 	// 사용자가 완료 여부를 수정하고자 하는 to-do를 받아와 저장 후 해당 날짜 추출
@@ -234,6 +243,7 @@ void LoadToDoScreen::editToDo()
 	myPlanner.overlapToDos(myTdm);
 
 	// 변경 성공 메시지 출력
+	string compStr = (target.getCheck() == "Y") ? "Incomplete" : "Complete";
 	cout << "\nYour \'" << target.getTask() << "\' task in " << dateToStr(myPlanner.getYearMonthDay())
-		 << " has been successfully changed!" << endl;
+		 << " has been successfully changed to \'" << compStr << "\'!" << endl;
 }

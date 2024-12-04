@@ -8,7 +8,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 	int yearInput, monthInput, dayInput;
 
 	// 사용자로부터 년도와 월 입력 후 설정
-	cout << "-------------------Enter the information about date------------------" << endl;
+	cout << "\n------------------[Enter the information about date]-----------------" << endl;
 	while (true) {
 		cout << "Enter year: ";
 		cin >> yearInput;
@@ -58,7 +58,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 	}
 	myPlanner.setDay(dayInput);
 
-
+	
 	// 사용자에게 입력한 날짜 보여주고 to-do 입력 모드 진입
 	system("cls");
 	myPlanner.printCalendar(0);
