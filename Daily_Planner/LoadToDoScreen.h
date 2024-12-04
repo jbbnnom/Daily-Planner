@@ -13,8 +13,8 @@ public:
 
 	void drawScreen(int& mode) override;
 
-	void showByDate();
-	void showByCategory();
+	int showByDate();
+	int showByCategory();
 	void showByImportance();
 	void editToDo();
 };

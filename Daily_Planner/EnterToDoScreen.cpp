@@ -8,7 +8,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 	int yearInput, monthInput, dayInput;
 
 	// 사용자로부터 년도와 월 입력 후 설정
-	cout << "----------Enter the information about date----------" << endl;
+	cout << "-------------------Enter the information about date------------------" << endl;
 	while (true) {
 		cout << "Enter year: ";
 		cin >> yearInput;
@@ -42,12 +42,12 @@ void EnterToDoScreen::drawScreen(int& mode)
 	myPlanner.printCalendar();
 
 	// 일 입력
-	moveCursor(10, 10);
+	moveCursor(0, 10);
 	while (true) {
 		cout << "Enter day: ";
 		cin >> dayInput;
 
-		if (cin.fail() || dayInput < 1 || dayInput > 12) {
+		if (cin.fail() || dayInput < 1 || dayInput > 31) {
 			cin.clear();
 			cin.ignore(32767, '\n');
 			cerr << "Invalid month. Try again." << endl;
@@ -66,17 +66,34 @@ void EnterToDoScreen::drawScreen(int& mode)
 	myPlanner.setYearMonthDay();
 	chrono::weekday wd{ chrono::sys_days(myPlanner.getYearMonthDay()) };
 	
-	moveCursor(10, 10);
+	moveCursor(13, 10);
 	cout << "You have selected " << dateToStr(myPlanner.getYearMonthDay())
-		 << " [" << wd << "]\n" << endl;
+		 << " [" << wd << "]\n\n" << endl;
 
 	// 입력한 to-do는 ToDoManagement 클래스의 newTodo 멤버로 동적 할당되어 저장
 	myTdm.makeNewToDo();
-	myPlanner.writeToFile(myTdm.getNewToDo());
+
+	// 날짜는 별도로 설정 필요
+	string date;
+	date += to_string(yearInput);
+	date += "-";
+	if (monthInput < 10) {
+		date += "0";
+	}
+	date += to_string(monthInput);
+	date += "-";
+	if (dayInput < 10) {
+		date += "0";
+	}
+	date += to_string(dayInput);
+
+	ToDo ntd = myTdm.getNewToDo();
+	ntd.changeDate(date);
+	myPlanner.writeToFile(ntd);
 
 	// newTodo 멤버 메모리 할당 해제 후 홈 화면으로 복귀
 	myTdm.deallocToDo();
 
-	cout << "New to-do is successfully made!" << endl;
+	cout << "\nNew to-do is successfully made!" << endl;
 	mode = backToHomeScreen();
 }

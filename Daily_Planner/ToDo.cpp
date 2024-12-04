@@ -20,24 +20,3 @@ ToDo::ToDo(string task, string date,
 	this->importance = importance;
 	this->check = check;
 }
-
-
-static string now_date() {
-	auto now = system_clock::now();
-	time_t nowTime = system_clock::to_time_t(now);
-	tm localTime = *localtime(&nowTime);
-	char dateBuffer[11];
-	strftime(dateBuffer, sizeof(dateBuffer), "%Y-%m-%d", &localTime);
-
-	return string(dateBuffer);
-}
-
-static string now_time() {
-	auto now = system_clock::now();
-	time_t nowTime = system_clock::to_time_t(now);
-	tm localTime = *localtime(&nowTime);
-	char timeBuffer[9];
-	strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", &localTime);
-
-	return string(timeBuffer);
-}

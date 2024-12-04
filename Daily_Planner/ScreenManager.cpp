@@ -146,7 +146,6 @@ int ScreenManager::backToHomeScreen() {
 	while (true) {
 		if (_kbhit()) {
 			int keyInput = _getch();
-			std::cout << "Key pressed: " << keyInput << std::endl;
 
 			if (keyInput == ESC) {
 				return 0; // HOME 스크린의 매크로 값 = 0
@@ -155,7 +154,6 @@ int ScreenManager::backToHomeScreen() {
 				std::cout << "Invalid key pressed. Press ESC to return.\n";
 			}
 		}
-		// Introduce a small delay to prevent busy-waiting
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 

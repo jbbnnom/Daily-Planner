@@ -15,9 +15,9 @@ void HomeScreen::drawScreen(int& mode)
 		_getch();
 	}
 
-	system("mode con: cols=69 lines=40");	// 기본 창 크기 설정
+	system("mode con: cols=69 lines=42");	// 기본 창 크기 설정
 
-	int keyInput, posY = 30;
+	int keyInput, posY = 32;
 
 	// 오늘 날짜를 받아와 저장
 	auto now = chrono::system_clock::now();
@@ -32,47 +32,44 @@ void HomeScreen::drawScreen(int& mode)
 		HANDLE buffer = hBuffer[i];
 
 		SetConsoleTitleA("Daily Planner");
-		setConsoleSize(buffer, 69, 40);
+		setConsoleSize(buffer, 69, 42);
 		clearBuffer(buffer);
 		SetConsoleCursorPosition(buffer, { 0, 0 });
 
 		drawTitle(buffer);
 		
-		// 오늘의 할 일 및 메뉴 출력
-		writeBuffer(buffer, 24, 18, "Today is " + dateToStr(ymd));
-		writeBuffer(buffer, 24, 20, "Today\'s to-do list");
-		if (!fs::exists(myPlanner.getPlannerPath())) {
-			writeBuffer(buffer, 24, 22, "There is nothing to do. Enjoy your day!\n");
-		}
-		else {
-			// 있는 경우...
-		}
+		// 메뉴 출력
+		writeBuffer(buffer, 21, 18, "Today is " + dateToStr(ymd));
+		writeBuffer(buffer, 24, 20, "<Today\'s to-do list>");
 
-		writeBuffer(buffer, 19, 28, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
-		writeBuffer(buffer, 26, 30, "Enter new To-do");
-		writeBuffer(buffer, 26, 30 + 2, "Load and Check To-dos");
-		writeBuffer(buffer, 26, 30 + 4, "Exit");
-		writeBuffer(buffer, 19, 36, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
+		writeBuffer(buffer, 18, 30, "■〓〓〓〓〓〓〓〓〓〓〓〓〓〓■");
+		writeBuffer(buffer, 25, 32, "Enter new To-do");
+		writeBuffer(buffer, 25, 32 + 2, "Load and Check To-dos");
+		writeBuffer(buffer, 25, 32 + 4, "Exit");
+		writeBuffer(buffer, 18, 38, "■〓〓〓〓〓〓〓〓〓〓〓〓〓〓■");
 	}
 
-	// 키보드 입력이 있을 때마다 2개의 버퍼가 계속해서 바뀌게 되어 깜빡거림 현상 해결
+	// 오늘의 할 일 출력
+	printTodaysToDos();
+
+	// 2개의 버퍼가 계속해서 바뀌게 되어 깜빡거림 현상 해결
 	while (true) {
 		HANDLE buffer = hBuffer[!active];
 
-		SetConsoleActiveScreenBuffer(buffer);	// 현재 출력되는 화면을 비활성화된 버퍼로 변경
+		SetConsoleActiveScreenBuffer(buffer);	// 현재 출력되는 화면을 비활성화된 버퍼로 변
 
 		// 메뉴 화살표 운용
-		for (int y = 30; y <= 34; y += 2) {
-			writeBuffer(buffer, 22, y, "  ");
+		for (int y = 32; y <= 36; y += 2) {
+			writeBuffer(buffer, 21, y, "  ");
 		}
-		writeBuffer(buffer, 22, posY, "▶");
+		writeBuffer(buffer, 21, posY, "▶");
 
 		// 키보드 입력
 		if (_kbhit()) {	// 키 입력이 확인되면...
 			keyInput = _getch();	// 그 입력을 받아 keyInput에 저장
 			if (keyInput == ARROW) {
-				keyInput = _getch();	// 방향키는 입력되면 ARROW(224)와 방향에 따른 값(UP-72/DOWN-80)이 총 2번 입력도니다 
-				if (keyInput == UP && posY > 30) {
+				keyInput = _getch();	// 방향키는 입력되면 ARROW(224)와 방향에 따른 값(UP-72/DOWN-80)이 총 2번 입력된다
+				if (keyInput == UP && posY > 32) {
 					posY -= 2;
 				}
 				else if (keyInput == DOWN && posY < 36) {
@@ -80,15 +77,15 @@ void HomeScreen::drawScreen(int& mode)
 				}
 			}
 			else if (keyInput == ENTER) {	// 엔터키 입력 시 해당 스크린으로 전환
-				if (posY == 30) {	// Enter new To-do
+				if (posY == 32) {	// "Enter new To-do"
 					mode = 1;
 					break;
 				}
-				else if (posY == 32) {	// Load and Check To-dos
+				else if (posY == 34) {	// "Load and Check To-dos"
 					mode = 2;
 					break;
 				}
-				else if (posY == 34) {	// Exit
+				else if (posY == 36) {	// "Exit"
 					exit(0);
 				}
 			}
@@ -97,5 +94,29 @@ void HomeScreen::drawScreen(int& mode)
 		// 2개의 버퍼를 교환
 		swapBuffer();
 		Sleep(16);
+	}
+}
+
+/* 각 버퍼 당 한번만 출력되면 되기 때문에 별도의 함수로 분리 */
+void HomeScreen::printTodaysToDos()
+{
+	// 오늘의 할 일 출력
+	if (!fs::exists(myPlanner.getPlannerPath())) {
+		writeBuffer(hBuffer[0], 24, 22, "There is nothing to do. Enjoy your day!\n");
+		writeBuffer(hBuffer[1], 24, 22, "There is nothing to do. Enjoy your day!\n");
+	}
+	else {
+		myTdm.loadOneDayToDos(myPlanner.getPlannerPath());
+		int i = 22;
+		vector<ToDo> todayTDList = myTdm.getToDos();
+		for (auto it = todayTDList.begin(); it != todayTDList.end(); it++) {
+			// todos 벡터를 돌며 아직 완료되지 않은 to-do만 출력
+			if (it->getCheck() == "N") {
+				string todayToDo = "◆  " + it->getTask() + "\n";
+				writeBuffer(hBuffer[0], 23, i, todayToDo);
+				writeBuffer(hBuffer[1], 23, i, todayToDo);
+				i += 2;
+			}
+		}
 	}
 }

@@ -14,28 +14,22 @@ void Planner::printCalendar()
 	weekday firstWeekDay = weekday{ sys_days{firstDay} };
 	year_month_day_last lastDay{ *ym / last };
 
-	cout.width(20);
-	cout << stringMonth[static_cast<unsigned>(ym->month())] << " " << ym->year() << "\n\n";
+	cout.flush();
 
-	cout.width(5);
-	cout << std::right << "SUN";
-	cout.width(5);
-	cout << std::right << "MON";
-	cout.width(5);
-	cout << std::right << "TUE";
-	cout.width(5);
-	cout << std::right << "WED";
-	cout.width(5);
-	cout << std::right << "THU";
-	cout.width(5);
-	cout << std::right << "FRI";
-	cout.width(5);
-	cout << std::right << "SAT";
+	cout << setw(35) << stringMonth[static_cast<unsigned>(ym->month())] << " " << ym->year() << "\n\n";
+
+	cout << setw(20) << std::right << "SUN";
+	cout << setw(5) << std::right << "MON";
+	cout << setw(5) << std::right << "TUE";
+	cout << setw(5) << std::right << "WED";
+	cout << setw(5) << std::right << "THU";
+	cout << setw(5) << std::right << "FRI";
+	cout << setw(5) << std::right << "SAT";
 	cout << endl;
 
 	// 해당 월의 시작 요일 확인 후 시작일 간격 조정 [c_encoding()의 범위: 0(SUN)~6(SAT)]
-	startPos = (firstWeekDay.c_encoding() + 1) * 5;
-	cout.width(startPos);
+	startPos = (firstWeekDay.c_encoding() + 1) * 5 + 15;
+	cout << setw(startPos);
 	
 	// 달력 출력
 	dayPos = firstWeekDay.c_encoding();
@@ -43,13 +37,15 @@ void Planner::printCalendar()
 		cout << std::right << i;
 		if (dayPos < 6) {
 			dayPos++;
+			cout << setw(5);
 		}
 		else {
 			dayPos = 0;
 			cout << endl;
+			cout << setw(20);
 		}
-		cout.width(5);
 	}
+	cout << endl;
 }
 
 
@@ -86,8 +82,18 @@ void Planner::loadAllToDos(ToDoManagement& tdm)
 	for (const auto& entry : fs::recursive_directory_iterator(plannerPath)) {
 		if (fs::is_regular_file(entry.path()) && entry.path().extension() == ".txt") {
 			tdm.loadOneDayToDos(entry.path());
-			cout << "Successfully loaded : " << entry.path() << endl;	// test output
 		}
+	}
+}
+
+/* 내용이 변경된 to-do를 파일에 덮어씌우는 함수 */
+void Planner::overlapToDos(ToDoManagement &tdm)
+{
+	fstream file(plannerPath, ios::out);
+	vector<ToDo> changedToDos = tdm.getToDos();
+
+	for (auto it = changedToDos.begin(); it != changedToDos.end(); it++) {
+		tdm.saveToDo(file, *it);
 	}
 }
 
@@ -99,6 +105,7 @@ void Planner::setPlannerPath(int mode)
 {
 	string yearStr, dayStr;
 
+	// 항상 안전하게 기 저장된 path를 지우고 시작
 	resetPlannerPath();
 
 	if (mode == 0) {	// year_month_day 객체로부터 설정

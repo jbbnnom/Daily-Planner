@@ -12,6 +12,7 @@ public:
 	HomeScreen(Planner& planner, ToDoManagement& tdm) : ScreenManager(planner, tdm) {};
 
 	void drawScreen(int& mode) override;
+	void printTodaysToDos();
 };
 
 #endif

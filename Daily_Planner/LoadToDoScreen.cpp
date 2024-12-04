@@ -14,7 +14,7 @@ void LoadToDoScreen::drawScreen(int& mode)
 
 	system("mode con: cols=69 lines=40");	// 기본 창 크기 설정
 
-	int keyInput, posY = 22;
+	int keyInput, posY = 22, code;
 	string userInput;
 
 	// 오늘 날짜를 받아와 저장
@@ -34,14 +34,14 @@ void LoadToDoScreen::drawScreen(int& mode)
 		drawTitle(buffer);
 
 		// 메뉴 출력
-		writeBuffer(buffer, 24, 18, "Today is " + dateToStr(ymd));
+		writeBuffer(buffer, 21, 18, "Today is " + dateToStr(ymd));
 
-		writeBuffer(buffer, 19, 20, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
-		writeBuffer(buffer, 26, 22, "Load by date");
-		writeBuffer(buffer, 26, 22 + 2, "Load by category");
-		writeBuffer(buffer, 26, 22 + 4, "Load after sorting by importance");
-		writeBuffer(buffer, 26, 22 + 6, "Back to home screen");
-		writeBuffer(buffer, 19, 22 + 8, "■〓〓〓〓〓〓〓〓〓〓〓〓〓■");
+		writeBuffer(buffer, 13, 20, "■〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓■");
+		writeBuffer(buffer, 20, 22, "Load by date");
+		writeBuffer(buffer, 20, 22 + 2, "Load by category");
+		writeBuffer(buffer, 20, 22 + 4, "Load after sorting by importance");
+		writeBuffer(buffer, 20, 22 + 6, "Back to home screen");
+		writeBuffer(buffer, 13, 22 + 8, "■〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓■");
 	}
 
 	// 키보드 입력이 있을 때마다 2개의 버퍼가 계속해서 바뀌게 되어 깜빡거림 현상 해결
@@ -51,9 +51,9 @@ void LoadToDoScreen::drawScreen(int& mode)
 		SetConsoleActiveScreenBuffer(buffer);	// 현재 출력되는 화면을 비활성화된 버퍼로 변경
 
 		for (int y = 22; y <= 28; y += 2) {
-			writeBuffer(buffer, 22, y, "  ");
+			writeBuffer(buffer, 16, y, "  ");
 		}
-		writeBuffer(buffer, 22, posY, "▶");
+		writeBuffer(buffer, 16, posY, "▶");
 
 		// 키보드 입력
 		if (_kbhit()) {
@@ -69,32 +69,37 @@ void LoadToDoScreen::drawScreen(int& mode)
 			}
 			else if (keyInput == ENTER) {	// 엔터가 입력되면 표준 화면 출력으로 버퍼 변경
 				SetConsoleActiveScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
-				if (posY == 22) {
-					showByDate();
+				if (posY == 22) {	// "Load by date"
+					if (code = showByDate()) {
+						mode = backToHomeScreen();
+						return;
+					}
 					break;
 				}
-				else if (posY == 24) {
-					showByCategory();
+				else if (posY == 24) {	// "Load by category"
+					if (code = showByCategory()) {
+						mode = backToHomeScreen();
+						return;
+					}
 					break;
 				}
-				else if (posY == 26) {
+				else if (posY == 26) {	// "Load after sorting by importance"
 					showByImportance();
 					break;
 				}
-				else if (posY == 28) {
+				else if (posY == 28) {	// "Back to home screen"
 					mode = 0;
 					return;
 				}
 			}
 		}
-
 		swapBuffer();
 		Sleep(16);
 	}
 
-	// 사용자에게 편집 여부 확인 - 아직 미구현
+	// 사용자에게 할일 완료 여부 확인
 	while (true) {
-		cout << "Do you want to edit a to-do? (Y/N): ";
+		cout << "Do you want to edit a to-do whether it is completed or not? (Y/N): ";
 		cin >> userInput;
 
 		if (userInput != "Y" && userInput != "y" && userInput != "N" && userInput != "n") {
@@ -106,13 +111,15 @@ void LoadToDoScreen::drawScreen(int& mode)
 		}
 		else {
 			editToDo();
+			cout << "Changed successfully!" << endl;
 			break;
 		}
 	}
+	mode = backToHomeScreen();
 }
 
 /* 사용자가 "Load by date" 선택 시 나오는 화면 출력 */
-void LoadToDoScreen::showByDate()
+int LoadToDoScreen::showByDate()
 {
 	int code;
 	string dateInput;
@@ -146,56 +153,84 @@ void LoadToDoScreen::showByDate()
 	// to-do list가 있는 경우에만 출력
 	if (code = myTdm.getToDosByDate(myPlanner.getPlannerPath())) {
 		cout << dateToStr(myPlanner.getYearMonthDay()) << "!" << endl;
+		return 1;
 	}
 	else {
-		moveCursor(10, 10);
-		cout << "To-do list in " << dateToStr(myPlanner.getYearMonthDay()) << endl;
+		moveCursor(24, 10);
+		cout << "[To-do list in " << dateToStr(myPlanner.getYearMonthDay()) << "]\n" << endl;
 		myTdm.printToDos_date();
 	}
+
+	return 0;
 }
 
 /* 사용자가 "Load by category" 선택 시 나오는 화면 출력 */
-void LoadToDoScreen::showByCategory()
+int LoadToDoScreen::showByCategory()
 {
 	string categoryInput;
+
+	system("mode con: cols=82 lines=40");
 
 	cout << "Enter category: ";
 	if (cin.peek() == '\n') {
 		cin.ignore();
 	}
 	getline(cin, categoryInput);
-	cout << categoryInput << endl;
 
 	myPlanner.loadAllToDos(myTdm);
 
 	myTdm.getToDoByCategory(categoryInput);
 
 	if (myTdm.getResult().empty()) {
-		cout << "The category you entered does not exist!" << endl;
+		cout << "\nThe category you entered does not exist!" << endl;
+		return 1;
 	}
 	else {
 		system("cls");
-		cout << "All to-dos in \'" << categoryInput << "\'" << endl;
+		moveCursor(30, 0);
+		cout << "[All to-dos in \'" << categoryInput << "\']\n" << endl;
 		myTdm.printToDos_category();
 	}
+	
+	return 0;
 }
 
 /* 사용자가 "Load after sorting by importance" 선택 시 나오는 화면 출력 */
 void LoadToDoScreen::showByImportance()
 {
+	system("mode con: cols=92 lines=40");
+
 	myPlanner.loadAllToDos(myTdm);
 
 	myTdm.sortToDoByImportance();
 
 	system("cls");
-	cout << "Sorted by Importance" << endl;
+	moveCursor(35, 0);
+	cout << "[Sorted by Importance]\n" << endl;
 	myTdm.printToDos_importance();
 }
 
-/* to-do의 전체 수정이 가능해야 하는가, 아니면 체크 여부만 수정이 가능해야 하는가.. */
+/* 사용자가 완료/미완료 여부를 변경 */
 void LoadToDoScreen::editToDo()
 {
-	ToDo target = myTdm.printToDos_editMode();
+	// 화면을 한번 없애고 시작
+	system("cls");
+	system("mode con: cols=97 lines=40");
 
-	// 수정 모드 구현 필요..
+	moveCursor(40, 0);
+	cout << "[Edit mode]\n" << endl;
+
+	// 사용자가 완료 여부를 수정하고자 하는 to-do를 받아와 저장 후 해당 날짜 추출
+	ToDo target = myTdm.printToDos_editMode();
+	string targetDate = target.getDate();
+
+	// to-do의 날짜와 디렉터리 경로 설정, 반드시 파일 존재
+	myPlanner.setYearMonthDay(stoi(targetDate.substr(0, 4)), stoi(targetDate.substr(5, 2)), stoi(targetDate.substr(8, 2)));
+	myPlanner.setPlannerPath(0);	// year_month_day 객체로부터 설정하므로 0번 모드
+
+	// 해당 날짜에 저장된 모든 to-do를 불러와 완료 여부 변경 후 덮어 씌우는 식으로 구현
+	myTdm.getToDosByDate(myPlanner.getPlannerPath());
+	myTdm.changeComplete(target);
+
+	myPlanner.overlapToDos(myTdm);
 }

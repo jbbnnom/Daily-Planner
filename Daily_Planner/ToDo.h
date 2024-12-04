@@ -28,10 +28,10 @@ public:
 
 	//setter
 	void taskComplete() {	//실행 시 태스크 상태 바뀜. 만약 태스크 상태를 '완료 -> 미완료'로 하고 싶을 때도 이걸로 실행하면 됨.
-		check = !check; 
+		check = !check;
 	}
 	void changeTask(std::string task) {
-		this->task = task; 
+		this->task = task;
 	}
 	void changeCategory(std::string category) {
 		this->category = category;
@@ -67,14 +67,10 @@ public:
 	}
 	int getImportance() {
 		return importance;
-		//아니 굳이 이걸 해야되나???????그냥 멤버변수 싹다 퍼블릭 설정하면 안되냐
 	}
 	std::string getCheck() {
 		return check ? "Y" : "N";
 	}
-
-	static std::string now_date();
-	static std::string now_time();
 };
 
 #endif

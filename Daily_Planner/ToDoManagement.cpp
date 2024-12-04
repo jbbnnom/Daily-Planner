@@ -5,19 +5,6 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-/*Index가 유효한지 간편하게 확인하기 위한 함수.다른 함수 내에서만 쓰임.*/
-bool ToDoManagement::IndexExistence(int index)
-{
-	if (index >= 0 && index < todos.size()) {
-		return true;
-	}
-	else {
-		cerr << "Invalied index\n";
-		return false;
-	}
-}
-
-
 /* to-do에 입력한 날짜 포맷의 유효성 확인 [YYYY/MM/DD] */
 bool ToDoManagement::isValidDate(const string& date)
 {
@@ -60,7 +47,7 @@ void ToDoManagement::makeNewToDo()
 	string task, date, startTime, endTime, category;
 	int importance;
 
-	cout << "----------Enter the information about your To-do----------" << endl;
+	cout << "---------------Enter the information about your To-do----------------" << endl;
 
 	cout << "Enter task: ";
 	if (cin.peek() == '\n') {
@@ -115,7 +102,6 @@ int ToDoManagement::getToDosByDate(const fs::path& filename) {
 
 //category에 해당하는 todo 불러오기
 void ToDoManagement::getToDoByCategory(const string& category) {
-	cout << todos.size() << endl;
 	for (auto& todo : todos) {
 		if (todo.getCategory() == category) {
 			searchResult.push_back(todo);
@@ -144,7 +130,7 @@ int ToDoManagement::loadOneDayToDos(const fs::path& filename) {
 	ifstream file(filename);
 
 	if (!file.is_open()) {	// 입력한 날짜에 to-do list가 없는 경우
-		cerr << "There is no to-do list in ";	// 이 클래스에 날짜 정보를 
+		cerr << "\nThere is no to-do list in ";	// 이 클래스에 날짜 정보를 저장할 수 없어 계속해서 리턴 코드 반환
 		return 1;
 	}
 
@@ -158,79 +144,84 @@ int ToDoManagement::loadOneDayToDos(const fs::path& filename) {
 		stringstream ss(line);
 
 		try {
-			// Parse each field from the line
+			// 한 줄의 각 필드 parsing
 			getline(ss, task, ',');
 			getline(ss, date, ',');
 			getline(ss, start_time, ',');
 			getline(ss, end_time, ',');
 			getline(ss, category, ',');
 
-			// Parse and validate importance
+			// 중요도는 정수라 별도 token으로 관리
 			getline(ss, token, ',');
 			if (!token.empty()) {
-				importance = stoi(token); // May throw exception
+				importance = stoi(token); // 이 과정에서 예외 발생 가능성 있음
 			}
 
-			// Parse and validate check
+			// 완료 여부 역시 위와 유사
 			getline(ss, token, ',');
 			if (!token.empty()) {
-				check = (token == "true");
+				check = (token == "Y");
 			}
 
-			// Create a ToDo object and add it to the list
+			// ToDo 객체를 만들어 todos 벡터에 삽입
+			// emplace_back을 사용해 매개변수만을 전달했음에도 자동으로 객체를 생성해줌
 			todos.emplace_back(task, date, start_time, end_time, category, importance, check);
 
 		}
 		catch (const std::exception& e) {
+			// 혹시모를 예외 발생 가능성 대비
 			cerr << "Error parsing line: " << line << ". Error: " << e.what() << endl;
-			// Skip this line and continue with the next one
 			continue;
 		}
 	}
 
 	file.close();
-	return 0;
+	return 0;	// 정상 종료
 }
 
 
 /* 사용자가 "Load by date" 선택 시 결과 출력 */
 void ToDoManagement::printToDos_date()
 {
-	cout << setw(12) << left << "Importance"
-		 << setw(10) << left << "Category"
-		 << setw(20) << left << "Task"
-		 << setw(11) << left << "Start time"
-		 << setw(8) << "End time"
-		 << setw(11) << "Completed" << endl;
+	cout << setw(10) << left << "Category"
+		 << setw(12) << left << "Importance"
+		 << setw(27) << left << "Task"
+		 << setw(12) << left << "Start time"
+		 << setw(10) << left << "End time"
+		 << setw(9) << left << "Completed";
+	cout << "--------------------------------------------------------------------------------\n";
 
 	for (auto& todo : todos)
 	{
-		cout << setw(12) << todo.getImportance()
-			 << setw(10) << left << todo.getCategory()
-			 << setw(20) << left << todo.getTask()
-			 << setw(11) << left << todo.getStartTime()
-			 << setw(8) << todo.getEndTime()
-			 << setw(4) << left << todo.getCheck() << endl;
+		cout << setw(10) << left << todo.getCategory()
+			 << setw(12) << left << todo.getImportance()
+			 << setw(27) << left << todo.getTask()
+			 << setw(12) << left << todo.getStartTime()
+			 << setw(10) << left << todo.getEndTime()
+			 << setw(9) << left << todo.getCheck() << endl;
 	}
-	cout << "\n";
+	cout << "\n\n";
 }
 
 /* 사용자가 "Load by category" 선택 시 결과 출력 */
 void ToDoManagement::printToDos_category()
 {
-	cout << setw(15) << left << "Date" << " "
-		 << setw(5) << left << "Importance" << " "
-		 << setw(25) << left << "Task" << " "
-		 << setw(12) << "Start time" << " " << setw(12) << "End time" << " "
-		 << setw(15) << "Complete or not" << endl;
+	cout << setw(12) << left << "Date"
+		 << setw(12) << left << "Importance"
+		 << setw(27) << left << "Task"
+		 << setw(12) << left << "Start time"
+		 << setw(10) << left << "End time"
+		 << setw(9) << left << "Completed";
+	cout << "----------------------------------------------------------------------------------\n";
 
 	for (auto& todo : searchResult)
 	{
-		cout << setw(5) << left << todo.getDate() << " "
-			 << setw(5) << todo.getImportance() << " "
-			 << setw(24) << todo.getTask() << " "
-			 << setw(10) << todo.getStartTime() << " " << setw(12) << todo.getEndTime() << " "
-			 << setw(12) << left << todo.getCheck() << endl;
+		cout << setw(12) << left << todo.getDate()
+			 << setw(12) << left << todo.getImportance()
+			 << setw(27) << left << todo.getTask()
+			 << setw(12) << left << todo.getStartTime()
+			 << setw(10) << left << todo.getEndTime()
+			 << setw(9) << left << todo.getCheck() << endl;
 	}
 	cout << "\n";
 }
@@ -238,54 +229,71 @@ void ToDoManagement::printToDos_category()
 /* 사용자가 "Load after sorting by importance" 선택 시 결과 출력 */
 void ToDoManagement::printToDos_importance()
 {
-	cout << setw(5) << left << "Importance" << " "
-	     << setw(15) << left << "Category" << " "
-		 << setw(15) << left << "Date" << " "
-		 << setw(25) << left << "Task" << " "
-		 << setw(12) << "Start time" << " " << setw(12) << "End time" << " "
-		 << setw(15) << "Complete or not" << endl;
+	cout << setw(12) << left << "Date"
+		 << setw(10) << left << "Category"
+		 << setw(12) << left << "Importance"
+		 << setw(27) << left << "Task"
+		 << setw(12) << left << "Start time"
+		 << setw(10) << left << "End time"
+		 << setw(9) << left << "Completed";
+	cout << "--------------------------------------------------------------------------------------------\n";
 
 	for (auto& todo : todos)
 	{
-		cout << setw(5) << left << todo.getImportance() << " "
-			 << setw(15) << todo.getCategory() << " "
-			 << setw(15) << left << todo.getDate() << " "
-			 << setw(24) << todo.getTask() << " "
-			 << setw(10) << todo.getStartTime() << " " << setw(12) << todo.getEndTime() << " "
-			 << setw(12) << left << todo.getCheck() << endl;
+		cout << setw(12) << left << todo.getDate()
+			 << setw(10) << left << todo.getCategory()
+			 << setw(12) << left << todo.getImportance()
+			 << setw(27) << left << todo.getTask()
+			 << setw(12) << left << todo.getStartTime()
+			 << setw(10) << todo.getEndTime()
+			 << setw(9) << left << todo.getCheck() << endl;
 	}
 	cout << "\n";
 }
 
-/* 임시 */
+/* 사용자가 원하는 to-do의 완료 여부를 변경하게 만드는 함수 */
 ToDo ToDoManagement::printToDos_editMode()
 {
 	int userInput, i;
-	vector<ToDo> tempVec = searchResult.empty() ? todos : searchResult;
+	vector<ToDo> tempVec = searchResult.empty() ? todos : searchResult;	// 둘 중 비어있지 않은 벡터가 현재 사용자가 입력한 정보가 담긴 벡터
 
-	cout << setw(5) << left << "No." << " "
-		 << setw(5) << left << "Importance" << " "
-		 << setw(15) << left << "Category" << " "
-		 << setw(15) << left << "Date" << " "
-		 << setw(25) << left << "Task" << " "
-		 << setw(12) << "Start time" << " " << setw(12) << "End time" << " "
-		 << setw(15) << "Complete or not" << endl;
+	cout << setw(5) << left << "No."
+		 << setw(12) << left << "Date"
+		 << setw(10) << left << "Category"
+	 	 << setw(12) << left << "Importance"
+	 	 << setw(27) << left << "Task"
+		 << setw(12) << left << "Start time"
+		 << setw(10) << left << "End time"
+		 << setw(9) << left << "Completed";
+	cout << "-------------------------------------------------------------------------------------------------\n";
 
-
-	for (i = 0; i < tempVec.size(); i++)
+	for (i = 0; i != tempVec.size(); i++)
 	{
-		cout << setw(5) << left << i + 1 << " "
-			 << setw(5) << left << tempVec[i].getImportance() << " "
-			 << setw(15) << tempVec[i].getCategory() << " "
-			 << setw(15) << left << tempVec[i].getDate() << " "
-			 << setw(24) << tempVec[i].getTask() << " "
-			 << setw(10) << tempVec[i].getStartTime() << " " << setw(12) << tempVec[i].getEndTime() << " "
-			 << setw(12) << left << tempVec[i].getCheck() << endl;
+		cout << setw(5) << left << i + 1
+			 << setw(12) << left << tempVec[i].getDate()
+			 << setw(10) << left << tempVec[i].getCategory()
+			 << setw(12) << left << tempVec[i].getImportance()
+			 << setw(27) << left << tempVec[i].getTask()
+			 << setw(12) << left << tempVec[i].getStartTime()
+			 << setw(10) << left << tempVec[i].getEndTime()
+			 << setw(9) << left << tempVec[i].getCheck() << endl;
 	}
 	cout << "\n";
 
+	// 사용자로부터 완료 여부를 변경하고자 하는 ToDo의 번호를 입력받아 해당 ToDo 객체를 리턴
 	cout << "Enter a number of to-do you want to edit: ";
 	cin >> userInput;
 
-	return tempVec[i - 1];
+	return tempVec[userInput - 1];
+}
+
+/* 매개변수로 주어진 to-do를 list 내에서 찾아 완료 여부를 변경하는 함수 */
+void ToDoManagement::changeComplete(ToDo& todo)
+{
+	for (auto it = todos.begin(); it != todos.end(); it++) {
+		if (it->getTask() == todo.getTask()) {
+			it->taskComplete();
+			return;
+		}
+	}
 }

@@ -29,7 +29,7 @@ private:
 	};
 
 public:
-	// Constructor and Destructor declaration
+	// Constructor 및 Destructor 선언
 	Planner() = default;
 	~Planner()
 	{
@@ -38,10 +38,11 @@ public:
 		delete ymd;
 	}
 
-	// Member function declaration
+	// 멤버 함수 선언
 	void printCalendar();
 	void writeToFile(ToDo& todo);
 	void loadAllToDos(ToDoManagement& tdm);
+	void overlapToDos(ToDoManagement& tdm);
 
 	// Setter
 	void setPlannerPath(int mode);
