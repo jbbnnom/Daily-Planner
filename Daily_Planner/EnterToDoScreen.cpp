@@ -39,7 +39,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 
 	// 현재 콘솔 화면 지우고 달력 출력
 	system("cls");
-	myPlanner.printCalendar();
+	myPlanner.printCalendar(0);
 
 	// 일 입력
 	moveCursor(0, 10);
@@ -61,7 +61,7 @@ void EnterToDoScreen::drawScreen(int& mode)
 
 	// 사용자에게 입력한 날짜 보여주고 to-do 입력 모드 진입
 	system("cls");
-	myPlanner.printCalendar();
+	myPlanner.printCalendar(0);
 
 	myPlanner.setYearMonthDay();
 	chrono::weekday wd{ chrono::sys_days(myPlanner.getYearMonthDay()) };

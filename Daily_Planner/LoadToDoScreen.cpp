@@ -111,7 +111,6 @@ void LoadToDoScreen::drawScreen(int& mode)
 		}
 		else {
 			editToDo();
-			cout << "Changed successfully!" << endl;
 			break;
 		}
 	}
@@ -147,7 +146,7 @@ int LoadToDoScreen::showByDate()
 	myPlanner.setPlannerPath(0);
 
 	system("cls");
-	myPlanner.printCalendar();
+	myPlanner.printCalendar(1);
 
 
 	// to-do list가 있는 경우에만 출력
@@ -233,4 +232,8 @@ void LoadToDoScreen::editToDo()
 	myTdm.changeComplete(target);
 
 	myPlanner.overlapToDos(myTdm);
+
+	// 변경 성공 메시지 출력
+	cout << "\nYour \'" << target.getTask() << "\' task in " << dateToStr(myPlanner.getYearMonthDay())
+		 << " has been successfully changed!" << endl;
 }

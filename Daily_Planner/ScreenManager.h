@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <string>
 #include <thread>
+#include <fstream>
 
 #define ARROW 224
 #define UP    72

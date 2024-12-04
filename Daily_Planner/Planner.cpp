@@ -5,30 +5,34 @@ using namespace std::chrono;
 namespace fs = std::filesystem;
 
 /* 콘솔에 달력 출력 */
-void Planner::printCalendar()
+void Planner::printCalendar(int mode)
 {
 	unsigned startPos, dayPos;
+	
+	// EnterToDoScreen(mode=0), LoadByDate(mode=1)에서 달라지는 화면 크기로 인한 가운데 정렬용
+	streamsize width = (mode == 0) ? 7 : 8;
 
 	// 입력한 년도와 달의 1일과 말일 정보를 저장
 	year_month_day firstDay{ ym->year() / ym->month() / 1d };
 	weekday firstWeekDay = weekday{ sys_days{firstDay} };
 	year_month_day_last lastDay{ *ym / last };
 
-	cout.flush();
 
-	cout << setw(35) << stringMonth[static_cast<unsigned>(ym->month())] << " " << ym->year() << "\n\n";
+	system("cls");
 
-	cout << setw(20) << std::right << "SUN";
-	cout << setw(5) << std::right << "MON";
-	cout << setw(5) << std::right << "TUE";
-	cout << setw(5) << std::right << "WED";
-	cout << setw(5) << std::right << "THU";
-	cout << setw(5) << std::right << "FRI";
-	cout << setw(5) << std::right << "SAT";
+	cout << setw(5 * width) << right << stringMonth[static_cast<unsigned>(ym->month())] << " " << ym->year() << "\n\n";
+
+	cout << setw(5 * (width - 3)) << right << "SUN";
+	cout << setw(5) << right << "MON";
+	cout << setw(5) << right << "TUE";
+	cout << setw(5) << right << "WED";
+	cout << setw(5) << right << "THU";
+	cout << setw(5) << right << "FRI";
+	cout << setw(5) << right << "SAT";
 	cout << endl;
 
 	// 해당 월의 시작 요일 확인 후 시작일 간격 조정 [c_encoding()의 범위: 0(SUN)~6(SAT)]
-	startPos = (firstWeekDay.c_encoding() + 1) * 5 + 15;
+	startPos = (static_cast<long long>(firstWeekDay.c_encoding()) + 1) * 5 + (5 * (width - 4));
 	cout << setw(startPos);
 	
 	// 달력 출력
@@ -42,7 +46,7 @@ void Planner::printCalendar()
 		else {
 			dayPos = 0;
 			cout << endl;
-			cout << setw(20);
+			cout << setw(5 * (width - 3));
 		}
 	}
 	cout << endl;

@@ -281,8 +281,16 @@ ToDo ToDoManagement::printToDos_editMode()
 	cout << "\n";
 
 	// 사용자로부터 완료 여부를 변경하고자 하는 ToDo의 번호를 입력받아 해당 ToDo 객체를 리턴
-	cout << "Enter a number of to-do you want to edit: ";
-	cin >> userInput;
+	while (true) {
+		cout << "Enter a number of to-do you want to edit: ";
+		cin >> userInput;
+
+		if (userInput < 1 || userInput > tempVec.size()) {
+			cout << "Invalid input. Try again." << endl;
+			continue;
+		}
+		break;
+	}
 
 	return tempVec[userInput - 1];
 }

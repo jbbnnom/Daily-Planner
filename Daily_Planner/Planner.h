@@ -39,7 +39,7 @@ public:
 	}
 
 	// 멤버 함수 선언
-	void printCalendar();
+	void printCalendar(int mode);
 	void writeToFile(ToDo& todo);
 	void loadAllToDos(ToDoManagement& tdm);
 	void overlapToDos(ToDoManagement& tdm);

@@ -100,15 +100,20 @@ void HomeScreen::drawScreen(int& mode)
 /* 각 버퍼 당 한번만 출력되면 되기 때문에 별도의 함수로 분리 */
 void HomeScreen::printTodaysToDos()
 {
+	ifstream file(myPlanner.getPlannerPath());
+
 	// 오늘의 할 일 출력
-	if (!fs::exists(myPlanner.getPlannerPath())) {
-		writeBuffer(hBuffer[0], 24, 22, "There is nothing to do. Enjoy your day!\n");
-		writeBuffer(hBuffer[1], 24, 22, "There is nothing to do. Enjoy your day!\n");
+	// 만약 해당 날짜의 디렉터리 혹은 파일이 없거나, 파일이 있는데 아무 내용도 없는 경우
+	if (!fs::exists(myPlanner.getPlannerPath()) || (file.peek() == ifstream::traits_type::eof())) {
+		writeBuffer(hBuffer[0], 15, 22, "There is nothing to do. Enjoy your day!\n");
+		writeBuffer(hBuffer[1], 15, 22, "There is nothing to do. Enjoy your day!\n");
 	}
 	else {
 		myTdm.loadOneDayToDos(myPlanner.getPlannerPath());
-		int i = 22;
+
+		int i = 22, completedNum = 0;
 		vector<ToDo> todayTDList = myTdm.getToDos();
+
 		for (auto it = todayTDList.begin(); it != todayTDList.end(); it++) {
 			// todos 벡터를 돌며 아직 완료되지 않은 to-do만 출력
 			if (it->getCheck() == "N") {
@@ -117,6 +122,14 @@ void HomeScreen::printTodaysToDos()
 				writeBuffer(hBuffer[1], 23, i, todayToDo);
 				i += 2;
 			}
+			else {
+				completedNum++;
+			}
+		} // end of for
+		// 모든 할 일을 완료한 경우도 비어 있는 경우와 동일하게 취급
+		if (completedNum == todayTDList.size()) {
+			writeBuffer(hBuffer[0], 15, 22, "There is nothing to do. Enjoy your day!\n");
+			writeBuffer(hBuffer[1], 15, 22, "There is nothing to do. Enjoy your day!\n");
 		}
 	}
 }
