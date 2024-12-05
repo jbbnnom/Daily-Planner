@@ -4,15 +4,15 @@ using namespace std;
 using namespace std::chrono;
 namespace fs = std::filesystem;
 
-/* ÄÜ¼Ö¿¡ ´Ş·Â Ãâ·Â */
+/* ì½˜ì†”ì— ë‹¬ë ¥ ì¶œë ¥ */
 void Planner::printCalendar(int mode)
 {
 	unsigned startPos, dayPos;
 	
-	// EnterToDoScreen(mode=0), LoadByDate(mode=1)¿¡¼­ ´Ş¶óÁö´Â È­¸é Å©±â·Î ÀÎÇÑ °¡¿îµ¥ Á¤·Ä¿ë
+	// EnterToDoScreen(mode=0), LoadByDate(mode=1)ì—ì„œ ë‹¬ë¼ì§€ëŠ” í™”ë©´ í¬ê¸°ë¡œ ì¸í•œ ê°€ìš´ë° ì •ë ¬ìš©
 	streamsize width = (mode == 0) ? 7 : 8;
 
-	// ÀÔ·ÂÇÑ ³âµµ¿Í ´ŞÀÇ 1ÀÏ°ú ¸»ÀÏ Á¤º¸¸¦ ÀúÀå
+	// ì…ë ¥í•œ ë…„ë„ì™€ ë‹¬ì˜ 1ì¼ê³¼ ë§ì¼ ì •ë³´ë¥¼ ì €ì¥
 	year_month_day firstDay{ ym->year() / ym->month() / 1d };
 	weekday firstWeekDay = weekday{ sys_days{firstDay} };
 	year_month_day_last lastDay{ *ym / last };
@@ -32,11 +32,11 @@ void Planner::printCalendar(int mode)
 	cout << setw(5) << right << "SAT";
 	cout << endl;
 
-	// ÇØ´ç ¿ùÀÇ ½ÃÀÛ ¿äÀÏ È®ÀÎ ÈÄ ½ÃÀÛÀÏ °£°İ Á¶Á¤ [c_encoding()ÀÇ ¹üÀ§: 0(SUN)~6(SAT)]
+	// í•´ë‹¹ ì›”ì˜ ì‹œì‘ ìš”ì¼ í™•ì¸ í›„ ì‹œì‘ì¼ ê°„ê²© ì¡°ì • [c_encoding()ì˜ ë²”ìœ„: 0(SUN)~6(SAT)]
 	startPos = (static_cast<long long>(firstWeekDay.c_encoding()) + 1) * 5 + (5 * (width - 4));
 	cout << setw(startPos);
 	
-	// ´Ş·Â Ãâ·Â
+	// ë‹¬ë ¥ ì¶œë ¥
 	dayPos = firstWeekDay.c_encoding();
 	for (unsigned i = 1; i <= unsigned(lastDay.day()); i++) {
 		cout << std::right << i;
@@ -54,11 +54,11 @@ void Planner::printCalendar(int mode)
 }
 
 
-/* »ç¿ëÀÚ°¡ ÀÔ·ÂÇÑ ÇÒ ÀÏ ÇÏ³ª¸¦ ÅØ½ºÆ® ÆÄÀÏ¿¡ ÀúÀå */
+/* ì‚¬ìš©ìê°€ ì…ë ¥í•œ í•  ì¼ í•˜ë‚˜ë¥¼ í…ìŠ¤íŠ¸ íŒŒì¼ì— ì €ì¥ */
 void Planner::writeToFile(ToDo &todo)
 {
 	setPlannerPath(1);
-	fstream file(plannerPath, ios::app);	// ÆÄÀÏÀÌ ÀÌ¹Ì ÀÖ´Â °æ¿ì ÀÌ¾î¼­ ÀÛ¼ºÇØ¾ß ÇÔ
+	fstream file(plannerPath, ios::app);	// íŒŒì¼ì´ ì´ë¯¸ ìˆëŠ” ê²½ìš° ì´ì–´ì„œ ì‘ì„±í•´ì•¼ í•¨
 
 	if (file.is_open()) {
 		ToDoManagement::saveToDo(file, todo);
@@ -68,22 +68,22 @@ void Planner::writeToFile(ToDo &todo)
 }
 
 
-/* ¸ğµç ÀÏÀÚÀÇ ÅØ½ºÆ® ÆÄÀÏ·ÎºÎÅÍ ÇÒ ÀÏÀ» °¡Á®¿Í todos º¤ÅÍ¿¡ ÀúÀå 
- * (Ä«Å×°í¸®º° °Ë»ö ¹× Áß¿äµµ ¼ø Á¤·Ä¿¡ È°¿ë)
+/* ëª¨ë“  ì¼ìì˜ í…ìŠ¤íŠ¸ íŒŒì¼ë¡œë¶€í„° í•  ì¼ì„ ê°€ì ¸ì™€ todos ë²¡í„°ì— ì €ì¥ 
+ * (ì¹´í…Œê³ ë¦¬ë³„ ê²€ìƒ‰ ë° ì¤‘ìš”ë„ ìˆœ ì •ë ¬ì— í™œìš©)
  */
 void Planner::loadAllToDos(ToDoManagement& tdm)
 {
-	// ½ÃÀÛ Àü todos º¤ÅÍ¸¦ ºñ¿ì°í °æ·Î¸¦ "~\Desktop\Daily Planner"·Î º¯°æ
+	// ì‹œì‘ ì „ todos ë²¡í„°ë¥¼ ë¹„ìš°ê³  ê²½ë¡œë¥¼ "~\Desktop\Daily Planner"ë¡œ ë³€ê²½
 	tdm.clearToDos();
 	resetPlannerPath();
 
-	// °æ·ÎÀÇ À¯È¿¼º °Ë»ç
+	// ê²½ë¡œì˜ ìœ íš¨ì„± ê²€ì‚¬
 	if (!fs::exists(plannerPath) || !fs::is_directory(plannerPath)) {
 		cout << "Invalid path: " << plannerPath << endl;
 		return;
 	}
 
-	// Daily PlannerÀÇ ¸ğµç ÇÏÀ§ µğ·ºÅÍ¸®, Áï ¸ğµç ÀÏÀÚÀÇ to-do list¸¦ °Ë»öÇØ todos º¤ÅÍ¿¡ ÀúÀå
+	// Daily Plannerì˜ ëª¨ë“  í•˜ìœ„ ë””ë ‰í„°ë¦¬, ì¦‰ ëª¨ë“  ì¼ìì˜ to-do listë¥¼ ê²€ìƒ‰í•´ todos ë²¡í„°ì— ì €ì¥
 	for (const auto& entry : fs::recursive_directory_iterator(plannerPath)) {
 		if (fs::is_regular_file(entry.path()) && entry.path().extension() == ".txt") {
 			tdm.loadOneDayToDos(entry.path());
@@ -91,29 +91,30 @@ void Planner::loadAllToDos(ToDoManagement& tdm)
 	}
 }
 
-/* ³»¿ëÀÌ º¯°æµÈ to-do¸¦ ÆÄÀÏ¿¡ µ¤¾î¾º¿ì´Â ÇÔ¼ö */
+/* ë‚´ìš©ì´ ë³€ê²½ëœ to-doë¥¼ íŒŒì¼ì— ë®ì–´ì”Œìš°ëŠ” í•¨ìˆ˜ */
 void Planner::overlapToDos(ToDoManagement &tdm)
 {
 	fstream file(plannerPath, ios::out);
 	vector<ToDo> changedToDos = tdm.getToDos();
 
-	for (auto it = changedToDos.begin(); it != changedToDos.end(); it++) {
+	for (auto& it = changedToDos.begin(); it != changedToDos.end(); it++) {
 		tdm.saveToDo(file, *it);
 	}
+	file.close();
 }
 
 
-/* To-do°¡ ÀûÈù ÅØ½ºÆ® ÆÄÀÏÀÌ ÀúÀåµÇ´Â °æ·Î ÁöÁ¤
- * ¹ÙÅÁÈ­¸é¿¡ ÀÖ´Â ÇÃ·¡³Ê Æú´õ¿¡ '³â-¿ù-ÀÏ' ¼ø¼­´ë·Î Æú´õ°¡ »ı¼ºµÇ¾î ÀÔ·ÂÇÑ ÀÏÀÚ¿¡ ÀúÀåµÈ´Ù
+/* To-doê°€ ì íŒ í…ìŠ¤íŠ¸ íŒŒì¼ì´ ì €ì¥ë˜ëŠ” ê²½ë¡œ ì§€ì •
+ * ë°”íƒ•í™”ë©´ì— ìˆëŠ” í”Œë˜ë„ˆ í´ë”ì— 'ë…„-ì›”-ì¼' ìˆœì„œëŒ€ë¡œ í´ë”ê°€ ìƒì„±ë˜ì–´ ì…ë ¥í•œ ì¼ìì— ì €ì¥ëœë‹¤
  */
 void Planner::setPlannerPath(int mode)
 {
 	string yearStr, dayStr;
 
-	// Ç×»ó ¾ÈÀüÇÏ°Ô ±â ÀúÀåµÈ path¸¦ Áö¿ì°í ½ÃÀÛ
+	// í•­ìƒ ì•ˆì „í•˜ê²Œ ê¸° ì €ì¥ëœ pathë¥¼ ì§€ìš°ê³  ì‹œì‘
 	resetPlannerPath();
 
-	if (mode == 0) {	// year_month_day °´Ã¼·ÎºÎÅÍ ¼³Á¤
+	if (mode == 0) {	// year_month_day ê°ì²´ë¡œë¶€í„° ì„¤ì •
 		yearStr = to_string(static_cast<int>(ymd->year()));
 		plannerPath /= yearStr;
 
@@ -122,7 +123,7 @@ void Planner::setPlannerPath(int mode)
 		dayStr = format("{}", ymd->day());
 		plannerPath /= dayStr;
 	}
-	else if (mode == 1) {	// year_month °´Ã¼¿Í day °´Ã¼·ÎºÎÅÍ ¼³Á¤
+	else if (mode == 1) {	// year_month ê°ì²´ì™€ day ê°ì²´ë¡œë¶€í„° ì„¤ì •
 		yearStr = to_string(static_cast<int>(ym->year()));
 		plannerPath /= yearStr;
 		
@@ -140,8 +141,8 @@ void Planner::setPlannerPath(int mode)
 }
 
 
-/* year_month °´Ã¼¿¡ ³â/¿ù Á¤º¸ ÀúÀå
- * (EnterToDoScreen¿¡¼­ ³â°ú ¿ù¸¸ ¹Ş°í ´Ş·ÂÀ» Ãâ·ÂÇÏ±â ¶§¹®¿¡ º°µµ·Î »ı¼ºÇÔ)
+/* year_month ê°ì²´ì— ë…„/ì›” ì •ë³´ ì €ì¥
+ * (EnterToDoScreenì—ì„œ ë…„ê³¼ ì›”ë§Œ ë°›ê³  ë‹¬ë ¥ì„ ì¶œë ¥í•˜ê¸° ë•Œë¬¸ì— ë³„ë„ë¡œ ìƒì„±í•¨)
  */
 void Planner::setYearMonth(int yearValue, int monthValue)
 {
@@ -151,7 +152,7 @@ void Planner::setYearMonth(int yearValue, int monthValue)
 	ym = new year_month{ year(yearValue) / month(monthValue) };
 }
 
-/* day °´Ã¼¿¡ ÀÏ Á¤º¸ ÀúÀå */
+/* day ê°ì²´ì— ì¼ ì •ë³´ ì €ì¥ */
 void Planner::setDay(int dayValue)
 {
 	if (d != nullptr) {
@@ -160,7 +161,7 @@ void Planner::setDay(int dayValue)
 	d = new day(dayValue);
 }
 
-/* year_month_day °´Ã¼¿¡ ³â/¿ù/ÀÏ Á¤º¸ ÀúÀå [Overloading #1 - year_month Å¸ÀÔ ¸â¹ö¿Í day Å¸ÀÔ ¸â¹ö·ÎºÎÅÍ] */
+/* year_month_day ê°ì²´ì— ë…„/ì›”/ì¼ ì •ë³´ ì €ì¥ [Overloading #1 - year_month íƒ€ì… ë©¤ë²„ì™€ day íƒ€ì… ë©¤ë²„ë¡œë¶€í„°] */
 void Planner::setYearMonthDay()
 {
 	if (ymd != nullptr) {
@@ -169,7 +170,7 @@ void Planner::setYearMonthDay()
 	ymd = new year_month_day(ym->year() / ym->month() / *d);
 }
 
-/* year_month_day °´Ã¼¿¡ ³â/¿ù/ÀÏ Á¤º¸ ÀúÀå [Overloading #2 - ¸Å°³º¯¼ö·Î ¹ŞÀº ³â/¿ù/ÀÏÀÇ Á¤¼ö°ªÀ¸·ÎºÎÅÍ] */
+/* year_month_day ê°ì²´ì— ë…„/ì›”/ì¼ ì •ë³´ ì €ì¥ [Overloading #2 - ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ì€ ë…„/ì›”/ì¼ì˜ ì •ìˆ˜ê°’ìœ¼ë¡œë¶€í„°] */
 void Planner::setYearMonthDay(int yearValue, int monthValue, int dayValue)
 {
 	if (ymd != nullptr) {
@@ -178,7 +179,7 @@ void Planner::setYearMonthDay(int yearValue, int monthValue, int dayValue)
 	ymd = new year_month_day{ year(yearValue) / month(monthValue) / day(dayValue)};
 }
 
-/* year_month_day °´Ã¼¿¡ ³â/¿ù/ÀÏ Á¤º¸ ÀúÀå [Overloading #3 - ¸Å°³º¯¼ö·Î ¹ŞÀº year_month_day °´Ã¼·ÎºÎÅÍ] */
+/* year_month_day ê°ì²´ì— ë…„/ì›”/ì¼ ì •ë³´ ì €ì¥ [Overloading #3 - ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ì€ year_month_day ê°ì²´ë¡œë¶€í„°] */
 void Planner::setYearMonthDay(year_month_day& p_ymd)
 {
 	if (ymd != nullptr) {
@@ -188,7 +189,7 @@ void Planner::setYearMonthDay(year_month_day& p_ymd)
 }
 
 
-/* year_month_day °´Ã¼¸¦ ¹®ÀÚ¿­(ex. December 9, 2024)·Î º¯È¯ */
+/* year_month_day ê°ì²´ë¥¼ ë¬¸ìì—´(ex. December 9, 2024)ë¡œ ë³€í™˜ */
 string dateToStr(year_month_day& ymd)
 {
 	vector<const char*> stringMonth = { "",
