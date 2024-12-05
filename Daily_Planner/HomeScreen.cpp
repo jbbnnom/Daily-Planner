@@ -111,16 +111,16 @@ void HomeScreen::printTodaysToDos()
 	else {
 		myTdm.loadOneDayToDos(myPlanner.getPlannerPath());
 
-		int i = 22, completedNum = 0;
+		int y = 22, completedNum = 0;
 		vector<ToDo> todayTDList = myTdm.getToDos();
 
-		for (auto it = todayTDList.begin(); it != todayTDList.end(); it++) {
+		for (auto& it = todayTDList.begin(); it != todayTDList.end(); it++) {
 			// todos 벡터를 돌며 아직 완료되지 않은 to-do만 출력
 			if (it->getCheck() == "N") {
 				string todayToDo = "◆  " + it->getTask() + "\n";
-				writeBuffer(hBuffer[0], 23, i, todayToDo);
-				writeBuffer(hBuffer[1], 23, i, todayToDo);
-				i += 2;
+				writeBuffer(hBuffer[0], 23, y, todayToDo);
+				writeBuffer(hBuffer[1], 23, y, todayToDo);
+				y += 2;
 			}
 			else {
 				completedNum++;
@@ -132,4 +132,5 @@ void HomeScreen::printTodaysToDos()
 			writeBuffer(hBuffer[1], 15, 22, "There is nothing to do. Enjoy your day!\n");
 		}
 	}
+	file.close();
 }
