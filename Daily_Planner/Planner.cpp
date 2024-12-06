@@ -39,7 +39,7 @@ void Planner::printCalendar(int mode)
 	// 달력 출력
 	dayPos = firstWeekDay.c_encoding();
 	for (unsigned i = 1; i <= unsigned(lastDay.day()); i++) {
-		cout << std::right << i;
+		cout << right << i;
 		if (dayPos < 6) {
 			dayPos++;
 			cout << setw(5);
