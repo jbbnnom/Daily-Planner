@@ -3,37 +3,37 @@
 using namespace std;
 
 /* [Constructor defintion]
- * main.cppÀÇ myPlanner¿Í myTdmÀ» »ç¿ëÇØ¾ß ÇÏ¹Ç·Î reference Å¸ÀÔÀÇ ¸Å°³º¯¼ö »ç¿ë
+ * main.cppì˜ myPlannerì™€ myTdmì„ ì‚¬ìš©í•´ì•¼ í•˜ë¯€ë¡œ reference íƒ€ì…ì˜ ë§¤ê°œë³€ìˆ˜ ì‚¬ìš©
  */
 ScreenManager::ScreenManager(Planner& planner, ToDoManagement& tdm)
 {
 	myPlanner = planner;
 	myTdm = tdm;
 
-	// ´õºí ¹öÆÛ¸µÀ» À§ÇØ HANDLE Å¸ÀÔ ¹öÆÛ 2°³¸¦ »ı¼º
+	// ë”ë¸” ë²„í¼ë§ì„ ìœ„í•´ HANDLE íƒ€ì… ë²„í¼ 2ê°œë¥¼ ìƒì„±
 	hBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	hBuffer[1] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	
 	active = false;
 
-	// Ä¿¼­ÀÇ ±ô¹ÚÀÓÀ» ¾ø¾Ö°í Å©±â¸¦ ÃÖ¼Ò°ªÀ¸·Î ÁöÁ¤ÇÔÀ¸·Î½á Ä¿¼­°¡ »ç¶óÁö°Ô µÊ
+	// ì»¤ì„œì˜ ê¹œë°•ì„ì„ ì—†ì• ê³  í¬ê¸°ë¥¼ ìµœì†Œê°’ìœ¼ë¡œ ì§€ì •í•¨ìœ¼ë¡œì¨ ì»¤ì„œê°€ ì‚¬ë¼ì§€ê²Œ ë¨
 	cursor.bVisible = false;
 	cursor.dwSize = 1;
 
-	// Ä¿¼­ ¼³Á¤À» °¢ ¹öÆÛ¿¡ ¹İ¿µ
+	// ì»¤ì„œ ì„¤ì •ì„ ê° ë²„í¼ì— ë°˜ì˜
 	SetConsoleCursorInfo(hBuffer[0], &cursor);
 	SetConsoleCursorInfo(hBuffer[1], &cursor);
 }
 
 
-/* ¸Å°³º¯¼ö·Î ÁÖ¾îÁø ÁÂÇ¥·Î Ä¿¼­ ÀÌµ¿ [Overloading #1 - Default Console] */
+/* ë§¤ê°œë³€ìˆ˜ë¡œ ì£¼ì–´ì§„ ì¢Œí‘œë¡œ ì»¤ì„œ ì´ë™ [Overloading #1 - Default Console] */
 void ScreenManager::moveCursor(SHORT x, SHORT y)
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-/* ¸Å°³º¯¼ö·Î ÁÖ¾îÁø ÁÂÇ¥·Î Ä¿¼­ ÀÌµ¿ [Overloading #2 - User-made Buffer] */
+/* ë§¤ê°œë³€ìˆ˜ë¡œ ì£¼ì–´ì§„ ì¢Œí‘œë¡œ ì»¤ì„œ ì´ë™ [Overloading #2 - User-made Buffer] */
 void ScreenManager::moveCursor(HANDLE buffer, SHORT x, SHORT y)
 {
 	COORD pos = { x, y };
@@ -41,8 +41,8 @@ void ScreenManager::moveCursor(HANDLE buffer, SHORT x, SHORT y)
 }
 
 
-/* ÁÖ¾îÁø ¹öÆÛ¿¡ ³»¿ëÀ» ÀÛ¼º [Overloading #1 - C-style ¹®ÀÚ¿­]
- * (´õºí ¹öÆÛ¸µ ±¸Çö ½Ã cout »ç¿ëÀÌ Á¦ÇÑµÇ¾î Á¦ÀÛ)
+/* ì£¼ì–´ì§„ ë²„í¼ì— ë‚´ìš©ì„ ì‘ì„± [Overloading #1 - C-style ë¬¸ìì—´]
+ * (ë”ë¸” ë²„í¼ë§ êµ¬í˜„ ì‹œ cout ì‚¬ìš©ì´ ì œí•œë˜ì–´ ì œì‘)
  */
 void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const char* content)
 {
@@ -52,8 +52,8 @@ void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const char* con
 	WriteFile(buffer, content, strlen(content), &charsWritten, NULL);
 }
 
-/* ÁÖ¾îÁø ¹öÆÛ¿¡ ³»¿ëÀ» ÀÛ¼º [Overloading #2 - string Å¸ÀÔ ¹®ÀÚ¿­]
- * (´õºí ¹öÆÛ¸µ ±¸Çö ½Ã cout »ç¿ëÀÌ Á¦ÇÑµÇ¾î Á¦ÀÛ)
+/* ì£¼ì–´ì§„ ë²„í¼ì— ë‚´ìš©ì„ ì‘ì„± [Overloading #2 - string íƒ€ì… ë¬¸ìì—´]
+ * (ë”ë¸” ë²„í¼ë§ êµ¬í˜„ ì‹œ cout ì‚¬ìš©ì´ ì œí•œë˜ì–´ ì œì‘)
  */
 void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const string& content)
 {
@@ -64,10 +64,10 @@ void ScreenManager::writeBuffer(HANDLE buffer, SHORT x, SHORT y, const string& c
 }
 
 
-/* ¹öÆÛ Å©±â¸¸Å­ °ø¹éÀ» ÀÔ·ÂÇØ ÇöÀç È­¸é¿¡ º¸ÀÌ´Â ³»¿ëÀ» ¸ğµÎ Á¦°Å */
+/* ë²„í¼ í¬ê¸°ë§Œí¼ ê³µë°±ì„ ì…ë ¥í•´ í˜„ì¬ í™”ë©´ì— ë³´ì´ëŠ” ë‚´ìš©ì„ ëª¨ë‘ ì œê±° */
 void ScreenManager::clearBuffer(HANDLE buffer)
 {
-	// ÇöÀç ¹öÆÛÀÇ Å©±â¸¦ ºÒ·¯¿Í ÀúÀå
+	// í˜„ì¬ ë²„í¼ì˜ í¬ê¸°ë¥¼ ë¶ˆëŸ¬ì™€ ì €ì¥
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(buffer, &csbi);
 	COORD bufferSize = csbi.dwSize;
@@ -77,7 +77,7 @@ void ScreenManager::clearBuffer(HANDLE buffer)
 }
 
 
-/* µÎ ¹öÆÛ¸¦ ±³È¯ÇØ flickering Çö»ó ¹æÁö */
+/* ë‘ ë²„í¼ë¥¼ êµí™˜í•´ flickering í˜„ìƒ ë°©ì§€ */
 void ScreenManager::swapBuffer()
 {
 	SetConsoleActiveScreenBuffer(hBuffer[active]);
@@ -85,34 +85,34 @@ void ScreenManager::swapBuffer()
 }
 
 
-/* ¸Å°³º¯¼ö·Î ¹ŞÀº ÄÜ¼Ö Ã¢ ¹× ¹öÆÛÀÇ Å©±â¸¦ Á¶Àı (width * height) */
+/* ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ì€ ì½˜ì†” ì°½ ë° ë²„í¼ì˜ í¬ê¸°ë¥¼ ì¡°ì ˆ (width * height) */
 void ScreenManager::setConsoleSize(HANDLE buffer, SHORT width, SHORT height)
 {
-    // #1: ¿øÇÒÇÑ º¯È¯À» À§ÇØ ÇöÀç Ã¢ Å©±â¸¦ ÁÙ¿©¾ß ÇÔ
-	// (ÀÌ °úÁ¤À» °ÅÄ¡Áö ¾ÊÀ¸¸é Ã¢ Å©±â°¡ default¿¡¼­ º¯ÇÏÁö ¾ÊÀ½)
+    // #1: ì›í• í•œ ë³€í™˜ì„ ìœ„í•´ í˜„ì¬ ì°½ í¬ê¸°ë¥¼ ì¤„ì—¬ì•¼ í•¨
+	// (ì´ ê³¼ì •ì„ ê±°ì¹˜ì§€ ì•Šìœ¼ë©´ ì°½ í¬ê¸°ê°€ defaultì—ì„œ ë³€í•˜ì§€ ì•ŠìŒ)
     SMALL_RECT smallScreen = { 0, 0, 1, 1 };
     SetConsoleWindowInfo(buffer, TRUE, &smallScreen);
 
-    // #2. ¹öÆÛ Å©±âºÎÅÍ Á¶Àı
+    // #2. ë²„í¼ í¬ê¸°ë¶€í„° ì¡°ì ˆ
     COORD bufferSize = { width, height };
 	SetConsoleScreenBufferSize(buffer, bufferSize);
 
-    // #3. Ã¢ Å©±â Á¶Àı
-    SMALL_RECT windowSize = { 0, 0, width - 1, height - 1 };	// SMALL_RECT ±¸Á¶Ã¼ÀÇ Æ¯¼º(inclusive coordinate) ¶§¹®¿¡ width¿Í height¿¡¼­ 1À» »©Áà¾ß ÇÔ
+    // #3. ì°½ í¬ê¸° ì¡°ì ˆ
+    SMALL_RECT windowSize = { 0, 0, width - 1, height - 1 };	// SMALL_RECT êµ¬ì¡°ì²´ì˜ íŠ¹ì„±(inclusive coordinate) ë•Œë¬¸ì— widthì™€ heightì—ì„œ 1ì„ ë¹¼ì¤˜ì•¼ í•¨
 	SetConsoleWindowInfo(buffer, TRUE, &windowSize);
 
-	// #4. ÇÁ·Î±×·¥ ½ÇÇà ½Ã Ã¢ Å©±â º¯°æ Á¦ÇÑ (±ÛÀÚ ±úÁü ¹æÁö ¹× UI À¯Áö)
+	// #4. í”„ë¡œê·¸ë¨ ì‹¤í–‰ ì‹œ ì°½ í¬ê¸° ë³€ê²½ ì œí•œ (ê¸€ì ê¹¨ì§ ë°©ì§€ ë° UI ìœ ì§€)
 	HWND hwndConsole = GetConsoleWindow();
 	LONG style = GetWindowLong(hwndConsole, GWL_STYLE);
-	style &= ~WS_SIZEBOX;         // Ã¢ Å×µÎ¸® ¸¶¿ì½º Å¬¸¯ Á¶Àı ºñÈ°¼ºÈ­
-	style &= ~WS_MAXIMIZEBOX;     // ÃÖ´ëÈ­ ¹öÆ° ºñÈ°¼ºÈ­
-	style &= ~WS_MINIMIZEBOX;     // ÃÖ¼ÒÈ­ ¹öÆ° ºñÈ°¼ºÈ­
+	style &= ~WS_SIZEBOX;         // ì°½ í…Œë‘ë¦¬ ë§ˆìš°ìŠ¤ í´ë¦­ ì¡°ì ˆ ë¹„í™œì„±í™”
+	style &= ~WS_MAXIMIZEBOX;     // ìµœëŒ€í™” ë²„íŠ¼ ë¹„í™œì„±í™”
+	style &= ~WS_MINIMIZEBOX;     // ìµœì†Œí™” ë²„íŠ¼ ë¹„í™œì„±í™”
 	SetWindowLong(hwndConsole, GWL_STYLE, style);
 	SetWindowPos(hwndConsole, NULL, 0, 0, 0, 0,
 		SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
-/* Å¸ÀÌÆ² Ãâ·Â */
+/* íƒ€ì´í‹€ ì¶œë ¥ */
 void ScreenManager::drawTitle(HANDLE handle)
 {
 	string s;
@@ -136,27 +136,27 @@ void ScreenManager::drawTitle(HANDLE handle)
 	writeBuffer(handle, 0, 0, s);
 }
 
-/* EnterToDoScreenÀÌ³ª LoadToDoScreen¿¡¼­ ¸ğµç È°µ¿ÀÌ Á¾·áµÇ¾úÀ» ¶§
- * ESCÅ°¸¦ ´©¸£¸é È¨(¸ŞÀÎ)È­¸éÀ¸·Î º¹±Í
+/* EnterToDoScreenì´ë‚˜ LoadToDoScreenì—ì„œ ëª¨ë“  í™œë™ì´ ì¢…ë£Œë˜ì—ˆì„ ë•Œ
+ * ESCí‚¤ë¥¼ ëˆ„ë¥´ë©´ í™ˆ(ë©”ì¸)í™”ë©´ìœ¼ë¡œ ë³µê·€
  */
 int ScreenManager::backToHomeScreen() {
-	std::cout << "Press ESC to go home screen...\n";
+	cout << "Press ESC to go home screen...\n";
 
-	// °è¼ÓÇØ¼­ ESCÅ°°¡ Á¤»óÀûÀ¸·Î ´­·È´ÂÁö È®ÀÎ
+	// ê³„ì†í•´ì„œ ESCí‚¤ê°€ ì •ìƒì ìœ¼ë¡œ ëˆŒë ¸ëŠ”ì§€ í™•ì¸
 	while (true) {
 		if (_kbhit()) {
 			int keyInput = _getch();
 
 			if (keyInput == ESC) {
-				return 0; // HOME ½ºÅ©¸°ÀÇ ¸ÅÅ©·Î °ª = 0
+				return 0; // HOME ìŠ¤í¬ë¦°ì˜ ë§¤í¬ë¡œ ê°’ = 0
 			}
 			else {
-				std::cout << "Invalid key pressed. Press ESC to return.\n";
+				cout << "Invalid key pressed. Press ESC to return.\n";
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		this_thread::sleep_for(chrono::milliseconds(50));
 	}
 
-	return -1; // °æ°í ¹æÁö¿ë
+	return -1; // ê²½ê³  ë°©ì§€ìš©
 }
 
