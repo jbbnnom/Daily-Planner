@@ -5,14 +5,14 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-/* to-do¿¡ ÀÔ·ÂÇÑ ³¯Â¥ Æ÷¸ËÀÇ À¯È¿¼º È®ÀÎ [YYYY/MM/DD] */
+/* to-doì— ì…ë ¥í•œ ë‚ ì§œ í¬ë§·ì˜ ìœ íš¨ì„± í™•ì¸ [YYYY-MM-DD] */
 bool ToDoManagement::isValidDate(const string& date)
 {
-	// ÀÔ·Â¹ŞÀº ³¯Â¥ ¹®ÀÚ¿­À» Á¤±Ô Ç¥Çö½ÄÀ¸·Î º¯È¯
+	// ì…ë ¥ë°›ì€ ë‚ ì§œ ë¬¸ìì—´ì„ ì •ê·œ í‘œí˜„ì‹ìœ¼ë¡œ ë³€í™˜
 	regex dateFormat(R"(\d{4}-\d{2}-\d{2})");
 
 	if (regex_match(date, dateFormat)) {
-		// Æ÷¸ËÀÌ ¸ÂÀ¸¸é ¿ù°ú ÀÏÀÇ ¹üÀ§ °Ë»ç
+		// í¬ë§·ì´ ë§ìœ¼ë©´ ì›”ê³¼ ì¼ì˜ ë²”ìœ„ ê²€ì‚¬
 		int year, month, day;
 		if (sscanf(date.c_str(), "%4d-%2d-%2d", &year, &month, &day) == 3) {
 			if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
@@ -23,14 +23,14 @@ bool ToDoManagement::isValidDate(const string& date)
 	return false;
 }
 
-/* to-do¿¡ ÀÔ·ÂÇÑ ½Ã°£ Æ÷¸ËÀÇ À¯È¿¼º È®ÀÎ [HH:MM:SS] */
+/* to-doì— ì…ë ¥í•œ ì‹œê°„ í¬ë§·ì˜ ìœ íš¨ì„± í™•ì¸ [HH:MM:SS] */
 bool ToDoManagement::isValidTime(const string& time)
 {
-	// ÀÔ·Â¹ŞÀº ½Ã°£ ¹®ÀÚ¿­À» Á¤±Ô Ç¥Çö½ÄÀ¸·Î º¯È¯
+	// ì…ë ¥ë°›ì€ ì‹œê°„ ë¬¸ìì—´ì„ ì •ê·œ í‘œí˜„ì‹ìœ¼ë¡œ ë³€í™˜
 	regex timeFormat(R"(\d{2}:\d{2}:\d{2})");
 
 	if (regex_match(time, timeFormat)) {
-		// Æ÷¸ËÀÌ ¸ÂÀ¸¸é ½Ã¿Í ºĞ, ÃÊÀÇ ¹üÀ§ °Ë»ç
+		// í¬ë§·ì´ ë§ìœ¼ë©´ ì‹œì™€ ë¶„, ì´ˆì˜ ë²”ìœ„ ê²€ì‚¬
 		int hour, minute, second;
 		if (sscanf(time.c_str(), "%2d:%2d:%2d", &hour, &minute, &second) == 3) {
 			if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
@@ -41,7 +41,7 @@ bool ToDoManagement::isValidTime(const string& time)
 	return false;
 }
 
-/* »ç¿ëÀÚ·ÎºÎÅÍ ÇÏ³ªÀÇ to-do¿¡ ´ëÇÑ Á¤º¸¸¦ ÀÔ·Â¹Ş¾Æ newTodo ¸â¹ö¿¡ ÀúÀå */
+/* ì‚¬ìš©ìë¡œë¶€í„° í•˜ë‚˜ì˜ to-doì— ëŒ€í•œ ì •ë³´ë¥¼ ì…ë ¥ë°›ì•„ newTodo ë©¤ë²„ì— ì €ì¥ */
 void ToDoManagement::makeNewToDo()
 {
 	string task, date, startTime, endTime, category;
@@ -85,13 +85,13 @@ void ToDoManagement::makeNewToDo()
 	cout << "Enter importance: ";
 	cin >> importance;
 
-	newTodo = new ToDo(task, date, startTime, endTime, category, importance);	// check´Â default parameter -> Ç×»ó false
+	newTodo = new ToDo(task, date, startTime, endTime, category, importance);	// checkëŠ” default parameter -> í•­ìƒ false
 }
 
 
-//ÇØ´çÇÏ´Â ÀÏÀÚÀÇ todo¸ñ·Ï ºÒ·¯¿À±â
+//í•´ë‹¹í•˜ëŠ” ì¼ìì˜ todoëª©ë¡ ë¶ˆëŸ¬ì˜¤ê¸°
 int ToDoManagement::getToDosByDate(const fs::path& filename) {
-	int code;	// ¸¸¾à »ç¿ëÀÚ°¡ ÀÔ·ÂÇÑ ³¯Â¥¿¡ ÇØ´çÇÏ´Â to-do list°¡ ¾ø´Â °æ¿ì 1ÀÌ ÀúÀåµÊ
+	int code;	// ë§Œì•½ ì‚¬ìš©ìê°€ ì…ë ¥í•œ ë‚ ì§œì— í•´ë‹¹í•˜ëŠ” to-do listê°€ ì—†ëŠ” ê²½ìš° 1ì´ ì €ì¥ë¨
 
 	clearToDos();
 	if (code = loadOneDayToDos(filename)) {
@@ -100,7 +100,7 @@ int ToDoManagement::getToDosByDate(const fs::path& filename) {
 	return 0;
 }
 
-//category¿¡ ÇØ´çÇÏ´Â todo ºÒ·¯¿À±â
+//categoryì— í•´ë‹¹í•˜ëŠ” todo ë¶ˆëŸ¬ì˜¤ê¸°
 void ToDoManagement::getToDoByCategory(const string& category) {
 	for (auto& todo : todos) {
 		if (todo.getCategory() == category) {
@@ -109,13 +109,13 @@ void ToDoManagement::getToDoByCategory(const string& category) {
 	}
 }
 
-//importance¿¡ µû¶ó todo Á¤·Ä
+//importanceì— ë”°ë¼ todo ì •ë ¬
 void ToDoManagement::sortToDoByImportance() {
 	sort(todos.begin(), todos.end(), compareImportance);
 }
 
 
-//ÇÏ³ªÀÇ to-do¸¦ ÆÄÀÏ¿¡ ÀúÀå
+//í•˜ë‚˜ì˜ to-doë¥¼ íŒŒì¼ì— ì €ì¥
 void ToDoManagement::saveToDo(fstream &file, ToDo &todo) {
 	file << todo.getTask() << "," << todo.getDate() << ","
 		 << todo.getStartTime() << "," << todo.getEndTime() << ","
@@ -123,14 +123,14 @@ void ToDoManagement::saveToDo(fstream &file, ToDo &todo) {
 		 << todo.getCheck() << "\n";
 }
 
-/* ÇÑ ³¯Â¥ÀÇ todo ÆÄÀÏ ºÒ·¯¿À±â 
- * (·±Å¸ÀÓ ¿¡·¯ ¹ß»ıÇØ¼­ ´Ù½Ã ÀÛ¼ºÇß½À´Ï´Ù)
+/* í•œ ë‚ ì§œì˜ todo íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸° 
+ * (ëŸ°íƒ€ì„ ì—ëŸ¬ ë°œìƒí•´ì„œ ë‹¤ì‹œ ì‘ì„±í–ˆìŠµë‹ˆë‹¤)
  */
 int ToDoManagement::loadOneDayToDos(const fs::path& filename) {
 	ifstream file(filename);
 
-	if (!file.is_open()) {	// ÀÔ·ÂÇÑ ³¯Â¥¿¡ to-do list°¡ ¾ø´Â °æ¿ì
-		cerr << "\nThere is no to-do list in ";	// ÀÌ Å¬·¡½º¿¡ ³¯Â¥ Á¤º¸¸¦ ÀúÀåÇÒ ¼ö ¾ø¾î °è¼ÓÇØ¼­ ¸®ÅÏ ÄÚµå ¹İÈ¯
+	if (!file.is_open()) {	// ì…ë ¥í•œ ë‚ ì§œì— to-do listê°€ ì—†ëŠ” ê²½ìš°
+		cerr << "\nThere is no to-do list in ";	// ì´ í´ë˜ìŠ¤ì— ë‚ ì§œ ì •ë³´ë¥¼ ì €ì¥í•  ìˆ˜ ì—†ì–´ ê³„ì†í•´ì„œ ë¦¬í„´ ì½”ë“œ ë°˜í™˜
 		return 1;
 	}
 
@@ -144,43 +144,43 @@ int ToDoManagement::loadOneDayToDos(const fs::path& filename) {
 		stringstream ss(line);
 
 		try {
-			// ÇÑ ÁÙÀÇ °¢ ÇÊµå parsing
+			// í•œ ì¤„ì˜ ê° í•„ë“œ parsing
 			getline(ss, task, ',');
 			getline(ss, date, ',');
 			getline(ss, start_time, ',');
 			getline(ss, end_time, ',');
 			getline(ss, category, ',');
 
-			// Áß¿äµµ´Â Á¤¼ö¶ó º°µµ tokenÀ¸·Î °ü¸®
+			// ì¤‘ìš”ë„ëŠ” ì •ìˆ˜ë¼ ë³„ë„ tokenìœ¼ë¡œ ê´€ë¦¬
 			getline(ss, token, ',');
 			if (!token.empty()) {
-				importance = stoi(token); // ÀÌ °úÁ¤¿¡¼­ ¿¹¿Ü ¹ß»ı °¡´É¼º ÀÖÀ½
+				importance = stoi(token); // ì´ ê³¼ì •ì—ì„œ ì˜ˆì™¸ ë°œìƒ ê°€ëŠ¥ì„± ìˆìŒ
 			}
 
-			// ¿Ï·á ¿©ºÎ ¿ª½Ã À§¿Í À¯»ç
+			// ì™„ë£Œ ì—¬ë¶€ ì—­ì‹œ ìœ„ì™€ ìœ ì‚¬
 			getline(ss, token, ',');
 			if (!token.empty()) {
 				check = (token == "Y");
 			}
 
-			// ToDo °´Ã¼¸¦ ¸¸µé¾î todos º¤ÅÍ¿¡ »ğÀÔ
-			// emplace_backÀ» »ç¿ëÇØ ¸Å°³º¯¼ö¸¸À» Àü´ŞÇßÀ½¿¡µµ ÀÚµ¿À¸·Î °´Ã¼¸¦ »ı¼ºÇØÁÜ
+			// ToDo ê°ì²´ë¥¼ ë§Œë“¤ì–´ todos ë²¡í„°ì— ì‚½ì…
+			// emplace_backì„ ì‚¬ìš©í•´ ë§¤ê°œë³€ìˆ˜ë§Œì„ ì „ë‹¬í–ˆìŒì—ë„ ìë™ìœ¼ë¡œ ê°ì²´ë¥¼ ìƒì„±í•´ì¤Œ
 			todos.emplace_back(task, date, start_time, end_time, category, importance, check);
 
 		}
 		catch (const std::exception& e) {
-			// È¤½Ã¸ğ¸¦ ¿¹¿Ü ¹ß»ı °¡´É¼º ´ëºñ
+			// í˜¹ì‹œëª¨ë¥¼ ì˜ˆì™¸ ë°œìƒ ê°€ëŠ¥ì„± ëŒ€ë¹„
 			cerr << "Error parsing line: " << line << ". Error: " << e.what() << endl;
 			continue;
 		}
 	}
 
 	file.close();
-	return 0;	// Á¤»ó Á¾·á
+	return 0;	// ì •ìƒ ì¢…ë£Œ
 }
 
 
-/* »ç¿ëÀÚ°¡ "Load by date" ¼±ÅÃ ½Ã °á°ú Ãâ·Â */
+/* ì‚¬ìš©ìê°€ "Load by date" ì„ íƒ ì‹œ ê²°ê³¼ ì¶œë ¥ */
 void ToDoManagement::printToDos_date()
 {
 	cout << setw(10) << left << "Category"
@@ -203,7 +203,7 @@ void ToDoManagement::printToDos_date()
 	cout << "\n\n";
 }
 
-/* »ç¿ëÀÚ°¡ "Load by category" ¼±ÅÃ ½Ã °á°ú Ãâ·Â */
+/* ì‚¬ìš©ìê°€ "Load by category" ì„ íƒ ì‹œ ê²°ê³¼ ì¶œë ¥ */
 void ToDoManagement::printToDos_category()
 {
 	cout << setw(12) << left << "Date"
@@ -226,7 +226,7 @@ void ToDoManagement::printToDos_category()
 	cout << "\n";
 }
 
-/* »ç¿ëÀÚ°¡ "Load after sorting by importance" ¼±ÅÃ ½Ã °á°ú Ãâ·Â */
+/* ì‚¬ìš©ìê°€ "Load after sorting by importance" ì„ íƒ ì‹œ ê²°ê³¼ ì¶œë ¥ */
 void ToDoManagement::printToDos_importance()
 {
 	cout << setw(12) << left << "Date"
@@ -251,11 +251,11 @@ void ToDoManagement::printToDos_importance()
 	cout << "\n";
 }
 
-/* »ç¿ëÀÚ°¡ ¿øÇÏ´Â to-doÀÇ ¿Ï·á ¿©ºÎ¸¦ º¯°æÇÏ°Ô ¸¸µå´Â ÇÔ¼ö */
+/* ì‚¬ìš©ìê°€ ì›í•˜ëŠ” to-doì˜ ì™„ë£Œ ì—¬ë¶€ë¥¼ ë³€ê²½í•˜ê²Œ ë§Œë“œëŠ” í•¨ìˆ˜ */
 ToDo ToDoManagement::printToDos_editMode()
 {
 	int userInput, i;
-	vector<ToDo> tempVec = searchResult.empty() ? todos : searchResult;	// µÑ Áß ºñ¾îÀÖÁö ¾ÊÀº º¤ÅÍ°¡ ÇöÀç »ç¿ëÀÚ°¡ ÀÔ·ÂÇÑ Á¤º¸°¡ ´ã±ä º¤ÅÍ
+	vector<ToDo> tempVec = searchResult.empty() ? todos : searchResult;	// ë‘˜ ì¤‘ ë¹„ì–´ìˆì§€ ì•Šì€ ë²¡í„°ê°€ í˜„ì¬ ì‚¬ìš©ìê°€ ì…ë ¥í•œ ì •ë³´ê°€ ë‹´ê¸´ ë²¡í„°
 
 	cout << setw(5) << left << "No."
 		 << setw(12) << left << "Date"
@@ -280,7 +280,7 @@ ToDo ToDoManagement::printToDos_editMode()
 	}
 	cout << "\n";
 
-	// »ç¿ëÀÚ·ÎºÎÅÍ ¿Ï·á ¿©ºÎ¸¦ º¯°æÇÏ°íÀÚ ÇÏ´Â ToDoÀÇ ¹øÈ£¸¦ ÀÔ·Â¹Ş¾Æ ÇØ´ç ToDo °´Ã¼¸¦ ¸®ÅÏ
+	// ì‚¬ìš©ìë¡œë¶€í„° ì™„ë£Œ ì—¬ë¶€ë¥¼ ë³€ê²½í•˜ê³ ì í•˜ëŠ” ToDoì˜ ë²ˆí˜¸ë¥¼ ì…ë ¥ë°›ì•„ í•´ë‹¹ ToDo ê°ì²´ë¥¼ ë¦¬í„´
 	while (true) {
 		cout << "Enter a number of to-do you want to edit: ";
 		cin >> userInput;
@@ -295,7 +295,7 @@ ToDo ToDoManagement::printToDos_editMode()
 	return tempVec[userInput - 1];
 }
 
-/* ¸Å°³º¯¼ö·Î ÁÖ¾îÁø to-do¸¦ list ³»¿¡¼­ Ã£¾Æ ¿Ï·á ¿©ºÎ¸¦ º¯°æÇÏ´Â ÇÔ¼ö */
+/* ë§¤ê°œë³€ìˆ˜ë¡œ ì£¼ì–´ì§„ to-doë¥¼ list ë‚´ì—ì„œ ì°¾ì•„ ì™„ë£Œ ì—¬ë¶€ë¥¼ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜ */
 void ToDoManagement::changeComplete(ToDo& todo)
 {
 	for (auto it = todos.begin(); it != todos.end(); it++) {
