@@ -168,7 +168,7 @@ int ToDoManagement::loadOneDayToDos(const fs::path& filename) {
 			todos.emplace_back(task, date, start_time, end_time, category, importance, check);
 
 		}
-		catch (const std::exception& e) {
+		catch (const exception& e) {
 			// 혹시모를 예외 발생 가능성 대비
 			cerr << "Error parsing line: " << line << ". Error: " << e.what() << endl;
 			continue;
