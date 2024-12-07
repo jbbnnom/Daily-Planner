@@ -245,7 +245,7 @@ void ToDoManagement::printToDos_importance()
 			 << setw(12) << left << todo.getImportance()
 			 << setw(27) << left << todo.getTask()
 			 << setw(12) << left << todo.getStartTime()
-			 << setw(10) << todo.getEndTime()
+			 << setw(10) << left << todo.getEndTime()
 			 << setw(9) << left << todo.getCheck() << endl;
 	}
 	cout << "\n";
