@@ -114,7 +114,7 @@ void HomeScreen::printTodaysToDos()
 		int y = 22, completedNum = 0;
 		vector<ToDo> todayTDList = myTdm.getToDos();
 
-		for (auto& it = todayTDList.begin(); it != todayTDList.end(); it++) {
+		for (auto it = todayTDList.begin(); it != todayTDList.end(); it++) {
 			// todos 벡터를 돌며 아직 완료되지 않은 to-do만 출력
 			if (it->getCheck() == "N") {
 				string todayToDo = "◆  " + it->getTask() + "\n";
