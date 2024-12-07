@@ -97,7 +97,7 @@ void Planner::overlapToDos(ToDoManagement &tdm)
 	fstream file(plannerPath, ios::out);
 	vector<ToDo> changedToDos = tdm.getToDos();
 
-	for (auto& it = changedToDos.begin(); it != changedToDos.end(); it++) {
+	for (auto it = changedToDos.begin(); it != changedToDos.end(); it++) {
 		tdm.saveToDo(file, *it);
 	}
 	file.close();
